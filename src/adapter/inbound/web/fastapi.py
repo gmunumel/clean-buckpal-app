@@ -7,28 +7,28 @@ from src.application.domain.service.money_transfer_properties import (
     MoneyTransferProperties,
 )
 from src.application.domain.service.send_money_service import SendMoneyService
-from src.application.domain.service.get_account_service import GetAccountService
-from src.application.domain.service.get_activity_service import GetActivityService
+from src.application.domain.service.list_account_service import ListAccountService
+from src.application.domain.service.list_activity_service import ListActivityService
 from src.application.domain.service.get_account_balance_service import (
     GetAccountBalanceService,
 )
-from src.application.domain.service.create_account_service import CreateAccountService
+from src.application.domain.service.insert_account_service import InsertAccountService
 from src.adapter.inbound.web.send_money_controller import SendMoneyController
-from src.adapter.inbound.web.get_account_controller import GetAccountController
-from src.adapter.inbound.web.get_activity_controller import GetActivityController
+from src.adapter.inbound.web.list_account_controller import ListAccountController
+from src.adapter.inbound.web.list_activity_controller import ListActivityController
 from src.adapter.inbound.web.get_account_balance_controller import (
     GetAccountBalanceController,
 )
-from src.adapter.inbound.web.create_account_controller import (
-    CreateAccountController,
+from src.adapter.inbound.web.insert_account_controller import (
+    InsertAccountController,
 )
 from src.application.port.inbound.send_money_use_case import SendMoneyUseCase
-from src.application.port.inbound.get_account_use_case import GetAccountUseCase
-from src.application.port.inbound.get_activity_use_case import GetActivityUseCase
+from src.application.port.inbound.list_account_use_case import ListAccountUseCase
+from src.application.port.inbound.list_activity_use_case import ListActivityUseCase
 from src.application.port.inbound.get_account_balance_use_case import (
     GetAccountBalanceUseCase,
 )
-from src.application.port.inbound.create_account_use_case import CreateAccountUseCase
+from src.application.port.inbound.insert_account_use_case import InsertAccountUseCase
 from src.adapter.outbound.persistence.in_memory_data_account_repository import (
     InMemoryDataAccountRepository,
 )
@@ -42,15 +42,20 @@ from src.adapter.outbound.persistence.account_persistence_adapter import (
     AccountPersistenceAdapter,
 )
 from src.adapter.outbound.persistence.mapper import (
-    GetAccountResponse,
+    AccountResponse,
     SendMoneyResponse,
-    GetActivityResponse,
+    ActivityResponse,
     GetAccountBalanceResponse,
-    CreateAccountResponse,
+    InsertAccountResponse,
     Mapper,
 )
 
 app = FastAPI()
+IN_MEMORY_DATA_ACCOUNT_REPOSITORY = InMemoryDataAccountRepository()
+IN_MEMORY_DATA_ACTIVITY_REPOSITORY = InMemoryDataActivityRepository()
+PERSISTENCE_ADAPTER = AccountPersistenceAdapter(
+    IN_MEMORY_DATA_ACCOUNT_REPOSITORY, IN_MEMORY_DATA_ACTIVITY_REPOSITORY
+)
 
 
 class SendMoneyRequest(BaseModel):
@@ -66,21 +71,14 @@ class CreateAccountRequest(BaseModel):
 
 # Dependency injection for the controller
 def send_money_controller():
-    in_memory_data_account_repository = InMemoryDataAccountRepository()
-    in_memory_data_activity_repository = InMemoryDataActivityRepository()
-
-    persistence_adapter = AccountPersistenceAdapter(
-        in_memory_data_account_repository, in_memory_data_activity_repository
-    )
-
     account_lock = InMemoryAccountLock()
 
     money_transfer_properties = MoneyTransferProperties()
 
     send_money_service: SendMoneyUseCase = SendMoneyService(
-        load_account_port=persistence_adapter,
+        load_account_port=PERSISTENCE_ADAPTER,
         account_lock=account_lock,
-        update_account_state_port=persistence_adapter,
+        update_account_state_port=PERSISTENCE_ADAPTER,
         money_transfer_properties=money_transfer_properties,
     )
 
@@ -88,59 +86,33 @@ def send_money_controller():
 
 
 def get_account_controller():
-    in_memory_data_account_repository = InMemoryDataAccountRepository()
-    in_memory_data_activity_repository = InMemoryDataActivityRepository()
+    list_account_service: ListAccountUseCase = ListAccountService(PERSISTENCE_ADAPTER)
 
-    persistence_adapter = AccountPersistenceAdapter(
-        in_memory_data_account_repository, in_memory_data_activity_repository
-    )
-
-    list_account_service: GetAccountUseCase = GetAccountService(persistence_adapter)
-
-    return GetAccountController(list_account_service)
+    return ListAccountController(list_account_service)
 
 
 def get_activity_controller():
-    in_memory_data_account_repository = InMemoryDataAccountRepository()
-    in_memory_data_activity_repository = InMemoryDataActivityRepository()
-
-    persistence_adapter = AccountPersistenceAdapter(
-        in_memory_data_account_repository, in_memory_data_activity_repository
+    list_activity_service: ListActivityUseCase = ListActivityService(
+        PERSISTENCE_ADAPTER
     )
 
-    list_activity_service: GetActivityUseCase = GetActivityService(persistence_adapter)
-
-    return GetActivityController(list_activity_service)
+    return ListActivityController(list_activity_service)
 
 
 def get_account_balance_controller():
-    in_memory_data_account_repository = InMemoryDataAccountRepository()
-    in_memory_data_activity_repository = InMemoryDataActivityRepository()
-
-    persistence_adapter = AccountPersistenceAdapter(
-        in_memory_data_account_repository, in_memory_data_activity_repository
-    )
-
     get_account_balance_service: GetAccountBalanceUseCase = GetAccountBalanceService(
-        persistence_adapter
+        PERSISTENCE_ADAPTER
     )
 
     return GetAccountBalanceController(get_account_balance_service)
 
 
-def create_account_controller():
-    in_memory_data_account_repository = InMemoryDataAccountRepository()
-    in_memory_data_activity_repository = InMemoryDataActivityRepository()
-
-    persistence_adapter = AccountPersistenceAdapter(
-        in_memory_data_account_repository, in_memory_data_activity_repository
+def insert_account_controller():
+    insert_account_service: InsertAccountUseCase = InsertAccountService(
+        PERSISTENCE_ADAPTER
     )
 
-    create_account_service: CreateAccountUseCase = CreateAccountService(
-        persistence_adapter
-    )
-
-    return CreateAccountController(create_account_service)
+    return InsertAccountController(insert_account_service)
 
 
 @app.exception_handler(ValueError)
@@ -176,17 +148,17 @@ async def send_money(
     return SendMoneyResponse(success=False, message="Insufficient funds.")
 
 
-@app.get("/account", response_model=list[GetAccountResponse])
+@app.get("/account", response_model=list[AccountResponse])
 async def get_account(
-    controller: GetAccountController = Depends(get_account_controller),
+    controller: ListAccountController = Depends(get_account_controller),
 ):
     accounts = controller.list_account()
     return [Mapper.map_to_account_entity(account) for account in accounts]
 
 
-@app.get("/activity", response_model=list[GetActivityResponse])
+@app.get("/activity", response_model=list[ActivityResponse])
 async def get_activity(
-    controller: GetActivityController = Depends(get_activity_controller),
+    controller: ListActivityController = Depends(get_activity_controller),
 ):
     activities = controller.list_activity()
     return [Mapper.map_to_activity_entity(activity) for activity in activities]
@@ -201,10 +173,10 @@ async def get_account_balance(
     return Mapper.map_to_get_account_balance_entity(account_id, account_balance)
 
 
-@app.post("/account", response_model=CreateAccountResponse)
+@app.post("/account", response_model=InsertAccountResponse)
 async def create_account(
     request: CreateAccountRequest,
-    controller: CreateAccountController = Depends(create_account_controller),
+    controller: InsertAccountController = Depends(insert_account_controller),
 ):
-    controller.create_account(request.account_id, request.amount)
-    return Mapper.map_to_create_account_entity(request.account_id, request.amount)
+    account = controller.insert_account(request.account_id, request.amount)
+    return Mapper.map_to_insert_account_entity(account)

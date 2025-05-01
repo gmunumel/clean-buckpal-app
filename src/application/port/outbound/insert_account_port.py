@@ -2,9 +2,10 @@ from abc import ABC, abstractmethod
 
 from src.application.domain.model.account_id import AccountId
 from src.application.domain.model.money import Money
+from src.application.domain.model.account import Account
 
 
-class CreateAccountPort(ABC):
+class InsertAccountPort(ABC):
     """
     Port for inserting an account.
     This port is used by the application layer to insert an account into a data source.
@@ -12,5 +13,5 @@ class CreateAccountPort(ABC):
     """
 
     @abstractmethod
-    def insert_account(self, account_id: AccountId, money: Money):
+    def insert_account(self, account_id: AccountId, money: Money) -> Account:
         pass

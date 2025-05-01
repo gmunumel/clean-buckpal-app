@@ -12,7 +12,7 @@ class SendMoneyResponse(BaseModel):
     activity_id: int
 
 
-class GetActivityResponse(BaseModel):
+class ActivityResponse(BaseModel):
     activity_id: int
     owner_account_id: int
     source_account_id: int
@@ -21,10 +21,10 @@ class GetActivityResponse(BaseModel):
     money: float
 
 
-class GetAccountResponse(BaseModel):
+class AccountResponse(BaseModel):
     account_id: int
     baseline_balance: float
-    activity_window: list[GetActivityResponse] = []
+    activity_window: list[ActivityResponse] = []
 
 
 class GetAccountBalanceResponse(BaseModel):
@@ -37,33 +37,33 @@ class DepositMoneyResponse(BaseModel):
     amount: float
 
 
-class CreateAccountResponse(GetAccountBalanceResponse):
-    pass
+class InsertAccountResponse(GetAccountBalanceResponse):
+    activity_id: int
 
 
 class Mapper:
     @staticmethod
-    def map_to_account_entity(account: Account) -> GetAccountResponse:
+    def map_to_account_entity(account: Account) -> AccountResponse:
         account_id = account.get_id()
         activity_windows = account.get_activity_window()
         activities = []
         for activity in activity_windows.get_activities():
             activities.append(Mapper.map_to_activity_entity(activity))
-        return GetAccountResponse(
+        return AccountResponse(
             account_id=account_id.get_id(),
             baseline_balance=account.baseline_balance.amount,
             activity_window=activities,
         )
 
     @staticmethod
-    def map_to_activity_entity(activity: Activity) -> GetActivityResponse:
+    def map_to_activity_entity(activity: Activity) -> ActivityResponse:
         activity_id = activity.get_id()
         activity_owner_account_id = activity.get_owner_account_id()
         activity_source_account_id = activity.get_source_account_id()
         activity_target_account_id = activity.get_target_account_id()
         activity_timestamp = activity.get_timestamp()
         activity_money = activity.get_money()
-        return GetActivityResponse(
+        return ActivityResponse(
             activity_id=activity_id.get_id(),
             owner_account_id=activity_owner_account_id.get_id(),
             source_account_id=activity_source_account_id.get_id(),
@@ -87,9 +87,15 @@ class Mapper:
         return DepositMoneyResponse(account_id=account_id, amount=amount)
 
     @staticmethod
-    def map_to_create_account_entity(
-        account_id: int, account_balance: Money
-    ) -> CreateAccountResponse:
-        return CreateAccountResponse(
-            account_id=account_id, balance=account_balance.get_amount()
+    def map_to_insert_account_entity(account: Account) -> InsertAccountResponse:
+        account_id = account.get_id()
+        balance = account.get_baseline_balance()
+        activity_window = account.get_activity_window()
+        activities = activity_window.get_activities()
+        last_activity = activities[-1]
+        activity_id = last_activity.get_id()
+        return InsertAccountResponse(
+            account_id=account_id.get_id(),
+            balance=balance.get_amount(),
+            activity_id=activity_id.get_id(),
         )

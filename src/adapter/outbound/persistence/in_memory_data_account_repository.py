@@ -16,11 +16,11 @@ class AbstractAccountRepository(ABC):
         pass
 
     @abstractmethod
-    def save(self, account: Account):
+    def save(self, account: Account) -> Account:
         pass
 
     @abstractmethod
-    def find_by_id(self, account_id: AccountId) -> Account:
+    def find_by_id(self, account_id: AccountId) -> Account | None:
         pass
 
 
@@ -38,13 +38,11 @@ class InMemoryDataAccountRepository(AbstractAccountRepository):
     def get_accounts(self) -> Dict[AccountId, Account]:
         return self._accounts
 
-    def save(self, account: Account):
+    def save(self, account: Account) -> Account:
         if account.get_id() is None:
             raise ValueError("Account ID cannot be None.")
         self._accounts[account.get_id()] = account
-
-    def find_by_id(self, account_id: AccountId) -> Account:
-        account = self._accounts.get(account_id)
-        if account is None:
-            raise ValueError(f"Account with ID {account_id} not found.")
         return account
+
+    def find_by_id(self, account_id: AccountId) -> Account | None:
+        return self._accounts.get(account_id)

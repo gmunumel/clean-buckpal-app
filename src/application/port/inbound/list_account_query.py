@@ -4,9 +4,9 @@ from src.application.domain.model.account_id import AccountId
 
 
 @dataclass(frozen=True)
-class GetAccountQuery:
+class ListAccountQuery:
     """
-    GetAccountQuery class representing a query to list accounts.
+    ListAccountQuery class representing a query to list accounts.
     """
 
     id: AccountId | None = None
@@ -15,4 +15,4 @@ class GetAccountQuery:
         return self.id
 
     def __repr__(self) -> str:
-        return f"GetAccountQuery(id={self.id!r})"
+        return f"ListAccountQuery(id={self.id!r})"

@@ -4,7 +4,7 @@ from src.application.domain.model.account import Account
 from src.application.domain.model.account_id import AccountId
 
 
-class GetAccountPort(ABC):
+class ListAccountPort(ABC):
     """
     Port for listing accounts.
     This port is used by the application layer to list accounts from a data source.

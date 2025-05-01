@@ -22,7 +22,7 @@ class AbstractActivityRepository(ABC):
         pass
 
     @abstractmethod
-    def find_by_id(self, activity_id: ActivityId) -> Activity:
+    def find_by_id(self, activity_id: ActivityId) -> Activity | None:
         pass
 
     @abstractmethod
@@ -64,11 +64,8 @@ class InMemoryDataActivityRepository(AbstractActivityRepository):
             raise ValueError("Activity ID cannot be None.")
         self._activities[activity_id] = activity
 
-    def find_by_id(self, activity_id: ActivityId) -> Activity:
-        activity = self._activities.get(activity_id)
-        if activity is None:
-            raise ValueError(f"Activity with ID {activity_id} not found.")
-        return activity
+    def find_by_id(self, activity_id: ActivityId) -> Activity | None:
+        return self._activities.get(activity_id)
 
     def find_by_owner_since(
         self, owner_account_id: AccountId, since: datetime

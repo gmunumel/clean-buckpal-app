@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import uuid4
 
 from src.application.domain.model.account import Account
 from src.application.domain.model.account_id import AccountId
@@ -9,8 +10,9 @@ from src.application.port.outbound.update_account_state_port import (
     UpdateAccountStatePort,
 )
 from src.application.port.outbound.load_account_port import LoadAccountPort
-from src.application.port.outbound.get_account_port import GetAccountPort
-from src.application.port.outbound.get_activity_port import GetActivityPort
+from src.application.port.outbound.list_account_port import ListAccountPort
+from src.application.port.outbound.list_activity_port import ListActivityPort
+from src.application.port.outbound.insert_account_port import InsertAccountPort
 from src.adapter.outbound.persistence.in_memory_data_account_repository import (
     InMemoryDataAccountRepository,
 )
@@ -21,7 +23,11 @@ from src.application.domain.model.activity_window import ActivityWindow
 
 
 class AccountPersistenceAdapter(
-    LoadAccountPort, GetAccountPort, GetActivityPort, UpdateAccountStatePort
+    LoadAccountPort,
+    ListAccountPort,
+    ListActivityPort,
+    InsertAccountPort,
+    UpdateAccountStatePort,
 ):
     """
     Persistence adapter for loading and updating account/activity information.
@@ -86,3 +92,25 @@ class AccountPersistenceAdapter(
 
         activity = self._activity_repository.find_by_id(activity_id)
         return [activity] if activity else []
+
+    def insert_account(self, account_id: AccountId, money: Money) -> Account:
+        account = self._account_repository.find_by_id(account_id)
+        if account:
+            raise ValueError(f"Account with ID {account_id} already saved.")
+
+        activity_window = ActivityWindow(
+            [
+                Activity(
+                    id=ActivityId(uuid4().int),
+                    owner_account_id=account_id,
+                    source_account_id=account_id,
+                    target_account_id=account_id,
+                    timestamp=datetime.now(),
+                    money=money,
+                )
+            ]
+        )
+        new_account = self._account_repository.save(
+            Account.with_id(account_id, money, activity_window)
+        )
+        return new_account

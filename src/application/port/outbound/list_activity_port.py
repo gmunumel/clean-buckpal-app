@@ -4,7 +4,7 @@ from src.application.domain.model.activity import Activity
 from src.application.domain.model.activity_id import ActivityId
 
 
-class GetActivityPort(ABC):
+class ListActivityPort(ABC):
     """
     Port for listing activities.
     This port is used by the application layer to list activities from a data source.

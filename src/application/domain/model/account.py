@@ -46,6 +46,9 @@ class Account:
     def get_activity_window(self) -> ActivityWindow:
         return self.activity_window
 
+    def get_baseline_balance(self) -> Money:
+        return self.baseline_balance
+
     def calculate_balance(self) -> Money:
         return Money.add(
             self.baseline_balance, self.activity_window.calculate_balance(self.get_id())

@@ -5,9 +5,9 @@ from src.application.domain.model.account_id import AccountId
 
 
 @dataclass(frozen=True)
-class CreateAccountCommand:
+class InsertAccountCommand:
     """
-    CreateAccountCommand to create a new bank account with an initial balance.
+    InsertAccountCommand to create a new bank account with an initial balance.
     This command is used to insert a new account into the system.
     """
 
@@ -28,6 +28,6 @@ class CreateAccountCommand:
 
     def __repr__(self):
         return (
-            f"CreateAccountCommand(account_id={self.account_id!r}, "
+            f"InsertAccountCommand(account_id={self.account_id!r}, "
             f"money={self.money!r})"
         )
