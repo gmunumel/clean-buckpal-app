@@ -1,0 +1,60 @@
+[project]
+authors = [{name="Gabriel Munumel", email ="gabrielmunumel@gmail.com"}]
+description = "This is a project to implement Clean Architecture with FastAPI"
+name = "clean-buckpal-app"
+readme = "README.md"
+requires-python = ">=3.12"
+version = "1.0.0"
+
+dynamic = ["dependencies"]
+
+[project.urls]
+Homepage = "https://github.com/gmunumel/clean-todo-app"
+
+[project.optional-dependencies]
+test = [
+  "coverage ==7.6.12",
+  "pytest ==8.3.5",
+]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.coverage.run]
+branch = true
+data_file = ".coverage/coverage-data"
+source = [
+  "src",
+]
+
+[tool.coverage.xml]
+output = ".coverage/coverage.xml"
+
+[tool.coverage.html]
+directory = ".coverage/coverage-html"
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "if self\\.debug",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if 0:",
+  "if __name__ == .__main__.:",
+  "@(abc\\.)?abstractmethod",
+  "if not is_testing:",
+  "pass",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  ".",
+  "src",
+]
+testpaths = [
+  "tests",
+]
+
+[tool.mypy]
+check_untyped_defs = true
