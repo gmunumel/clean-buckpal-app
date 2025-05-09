@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest coverage sqlalchemy pydantic
+          pip install pytest coverage pytest-mock httpx pytest-asyncio
 
       - name: Run tests with pytest
         run: |
