@@ -1,4 +1,4 @@
-![Test Status](https://github.com/gmunumel/clean-todo-app/actions/workflows/python-tests.yml/badge.svg)
+![Test Status](https://github.com/gmunumel/clean-buckpal-app/actions/workflows/python-tests.yml/badge.svg)
 
 # clean-todo-app
 
