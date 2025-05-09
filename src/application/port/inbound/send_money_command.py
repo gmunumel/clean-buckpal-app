@@ -22,15 +22,6 @@ class SendMoneyCommand:
         if not self.money.is_positive():
             raise ValueError("Money amount must be greater than zero.")
 
-    def get_source_account_id(self) -> AccountId:
-        return self.source_account_id
-
-    def get_target_account_id(self) -> AccountId:
-        return self.target_account_id
-
-    def get_money(self) -> Money:
-        return self.money
-
     def __repr__(self) -> str:
         return (
             f"SendCommand(source_account_id={self.source_account_id!r}, "

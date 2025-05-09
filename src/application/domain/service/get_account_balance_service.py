@@ -24,6 +24,7 @@ class GetAccountBalanceService(GetAccountBalanceUseCase):
         self._load_account_port = load_account_port
 
     def get_account_balance(self, query: GetAccountBalanceQuery) -> Money:
-        return self._load_account_port.load_account(
-            query.get_account_id(), datetime.now()
-        ).calculate_balance()
+        account_loaded = self._load_account_port.load_account(
+            query.account_id, datetime.now()
+        )
+        return account_loaded.calculate_balance()

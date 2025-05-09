@@ -11,5 +11,9 @@ class UpdateAccountStatePort(ABC):
     """
 
     @abstractmethod
-    def update_activities(self, account: Account):
+    def update_activities(self, accounts: list[Account]):
+        pass
+
+    @abstractmethod
+    def update_accounts(self, accounts: list[Account]):
         pass

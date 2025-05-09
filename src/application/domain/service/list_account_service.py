@@ -19,4 +19,4 @@ class ListAccountService(ListAccountUseCase):
         self._list_acount_port = list_account_port
 
     def list_account(self, list_account_query: ListAccountQuery) -> list[Account]:
-        return self._list_acount_port.list_account(list_account_query.get_id())
+        return self._list_acount_port.list_account(list_account_query.account_id)

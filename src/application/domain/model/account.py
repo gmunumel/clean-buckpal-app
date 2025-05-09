@@ -18,16 +18,6 @@ class Account:
     activity_window: ActivityWindow
 
     @classmethod
-    def without_id(
-        cls, baseline_balance: Money, activity_window: ActivityWindow
-    ) -> "Account":
-        return Account(
-            id=AccountId(0),
-            baseline_balance=baseline_balance,
-            activity_window=activity_window,
-        )
-
-    @classmethod
     def with_id(
         cls,
         account_id: AccountId,
@@ -40,18 +30,10 @@ class Account:
             activity_window=activity_window,
         )
 
-    def get_id(self) -> AccountId:
-        return self.id
-
-    def get_activity_window(self) -> ActivityWindow:
-        return self.activity_window
-
-    def get_baseline_balance(self) -> Money:
-        return self.baseline_balance
-
     def calculate_balance(self) -> Money:
         return Money.add(
-            self.baseline_balance, self.activity_window.calculate_balance(self.get_id())
+            self.baseline_balance,
+            self.activity_window.calculate_balance(self.id),
         )
 
     def withdraw(self, money: Money, target_account_id: AccountId) -> bool:
@@ -60,8 +42,8 @@ class Account:
 
         withdrawal = Activity(
             id=ActivityId(uuid4().int),
-            owner_account_id=self.get_id(),
-            source_account_id=self.get_id(),
+            owner_account_id=self.id,
+            source_account_id=self.id,
             target_account_id=target_account_id,
             timestamp=datetime.now(),
             money=money,
@@ -72,16 +54,17 @@ class Account:
     def may_withdraw(self, money: Money) -> bool:
         return Money.add(self.calculate_balance(), money.negate()).is_positive_or_zero()
 
-    def deposit(self, money: Money, source_account_id: AccountId):
+    def deposit(self, money: Money, source_account_id: AccountId) -> Activity:
         deposit = Activity(
             id=ActivityId(uuid4().int),
-            owner_account_id=self.get_id(),
+            owner_account_id=self.id,
             source_account_id=source_account_id,
-            target_account_id=self.get_id(),
+            target_account_id=self.id,
             timestamp=datetime.now(),
             money=money,
         )
         self.activity_window.add_activity(deposit)
+        return deposit
 
     def __repr__(self) -> str:
         return (

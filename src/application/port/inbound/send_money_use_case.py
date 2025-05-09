@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from src.application.port.inbound.send_money_command import SendMoneyCommand
+from src.application.domain.model.activity import Activity
 
 
 class SendMoneyUseCase(ABC):
@@ -13,5 +14,5 @@ class SendMoneyUseCase(ABC):
     """
 
     @abstractmethod
-    def send_money(self, send_money_command: SendMoneyCommand) -> bool:
+    def send_money(self, send_money_command: SendMoneyCommand) -> Activity:
         pass

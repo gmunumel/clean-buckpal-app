@@ -11,8 +11,5 @@ class GetAccountBalanceQuery:
 
     account_id: AccountId
 
-    def get_account_id(self) -> AccountId:
-        return self.account_id
-
     def __repr__(self) -> str:
         return f"GetAccountBalanceQuery(id={self.account_id!r})"

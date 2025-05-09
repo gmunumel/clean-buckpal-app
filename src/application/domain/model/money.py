@@ -38,8 +38,5 @@ class Money:
     def is_greater_than(self, money: "Money") -> bool:
         return self.amount - money.amount >= 1
 
-    def get_amount(self) -> float:
-        return self.amount
-
     def __repr__(self) -> str:
         return f"${self.amount:.2f}"

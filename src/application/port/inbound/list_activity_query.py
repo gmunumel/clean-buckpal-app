@@ -9,10 +9,7 @@ class ListActivityQuery:
     ListActivityQuery class representing a query to list activities.
     """
 
-    id: ActivityId | None = None
-
-    def get_id(self) -> ActivityId | None:
-        return self.id
+    activity_id: ActivityId | None = None
 
     def __repr__(self) -> str:
-        return f"ListActivityQuery(id={self.id!r})"
+        return f"ListActivityQuery(activity_id={self.activity_id!r})"

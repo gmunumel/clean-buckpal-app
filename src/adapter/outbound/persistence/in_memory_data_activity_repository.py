@@ -59,7 +59,7 @@ class InMemoryDataActivityRepository(AbstractActivityRepository):
         return self._activities
 
     def save(self, activity: Activity):
-        activity_id = activity.get_id()
+        activity_id = activity.id
         if activity_id is None:
             raise ValueError("Activity ID cannot be None.")
         self._activities[activity_id] = activity
@@ -74,7 +74,7 @@ class InMemoryDataActivityRepository(AbstractActivityRepository):
             activity
             for activity in self._activities.values()
             if activity.owner_account_id == owner_account_id
-            and activity.timestamp >= since
+            and activity.timestamp < since
         ]
 
     def get_withdrawal_balance_until(
@@ -85,7 +85,7 @@ class InMemoryDataActivityRepository(AbstractActivityRepository):
             for activity in self._activities.values()
             if activity.source_account_id == account_id
             and activity.owner_account_id == account_id
-            and activity.timestamp < until
+            and activity.timestamp >= until
         )
 
     def get_deposit_balance_until(
@@ -96,5 +96,8 @@ class InMemoryDataActivityRepository(AbstractActivityRepository):
             for activity in self._activities.values()
             if activity.target_account_id == account_id
             and activity.owner_account_id == account_id
-            and activity.timestamp < until
+            and activity.timestamp >= until
         )
+
+    def clear(self):
+        self._activities.clear()

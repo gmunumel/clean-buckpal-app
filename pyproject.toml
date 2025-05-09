@@ -13,8 +13,11 @@ Homepage = "https://github.com/gmunumel/clean-todo-app"
 
 [project.optional-dependencies]
 test = [
-  "coverage ==7.6.12",
-  "pytest ==8.3.5",
+  "coverage==7.6.12",
+  "pytest==8.3.5",
+  "pytest-mock==3.14.0",
+  "httpx==0.28.1",
+  "pytest-asyncio==0.26.0",
 ]
 
 [tool.setuptools.dynamic]
@@ -58,3 +61,11 @@ testpaths = [
 
 [tool.mypy]
 check_untyped_defs = true
+
+[tool.pylint]
+disable = [
+  "redefined-outer-name",
+  "missing-module-docstring",
+  "missing-function-docstring",
+  "missing-class-docstring",
+]

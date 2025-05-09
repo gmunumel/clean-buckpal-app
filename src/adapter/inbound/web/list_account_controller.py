@@ -1,7 +1,9 @@
 from src.application.port.inbound.list_account_use_case import ListAccountUseCase
-from src.application.port.inbound.list_account_query import ListAccountQuery
-from src.application.domain.model.account import Account
-from src.application.domain.model.account_id import AccountId
+from src.adapter.inbound.web.web_model import (
+    WebMapper,
+    ListAccountParam,
+    AccountResponse,
+)
 
 
 class ListAccountController:
@@ -17,7 +19,9 @@ class ListAccountController:
     def __init__(self, list_account_use_case: ListAccountUseCase):
         self._list_account_use_case = list_account_use_case
 
-    def list_account(self, idd: int | None = None) -> list[Account]:
-        account_id = AccountId(idd) if idd is not None else None
-        list_account_query = ListAccountQuery(account_id)
-        return self._list_account_use_case.list_account(list_account_query)
+    def list_account(
+        self, list_account_param: ListAccountParam
+    ) -> list[AccountResponse]:
+        list_account_query = WebMapper.map_to_list_account_query(list_account_param)
+        accounts = self._list_account_use_case.list_account(list_account_query)
+        return [WebMapper.map_to_account_entity(account) for account in accounts]

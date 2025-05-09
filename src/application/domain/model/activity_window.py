@@ -15,33 +15,30 @@ class ActivityWindow:
 
     activities: list[Activity]
 
-    def get_activities(self) -> list[Activity]:
-        return self.activities
-
     def add_activity(self, activity: Activity):
         self.activities.append(activity)
 
     def get_start_timestamp(self) -> datetime:
-        return max(activity.timestamp for activity in self.activities)
+        return min(activity.timestamp for activity in self.activities)
 
     def get_end_timestamp(self) -> datetime:
-        return min(activity.timestamp for activity in self.activities)
+        return max(activity.timestamp for activity in self.activities)
 
     def calculate_balance(self, account_id: AccountId) -> Money:
         deposit_balance = self._calculate_deposit_balance(account_id)
         withdraw_balance = self._calculate_withdraw_balance(account_id)
-        return Money.add(deposit_balance, withdraw_balance)
+        return Money.add(deposit_balance, withdraw_balance.negate())
 
     def _calculate_deposit_balance(self, account_id: AccountId) -> Money:
         deposit_balance = Money.zero()
         for activity in self.activities:
-            if activity.get_target_account_id() == account_id:
-                deposit_balance = Money.add(deposit_balance, activity.get_money())
+            if activity.target_account_id == account_id:
+                deposit_balance = Money.add(deposit_balance, activity.money)
         return deposit_balance
 
     def _calculate_withdraw_balance(self, account_id: AccountId) -> Money:
         withdraw_balance = Money.zero()
         for activity in self.activities:
-            if activity.get_source_account_id() == account_id:
-                withdraw_balance = Money.add(withdraw_balance, activity.get_money())
+            if activity.source_account_id == account_id:
+                withdraw_balance = Money.add(withdraw_balance, activity.money)
         return withdraw_balance

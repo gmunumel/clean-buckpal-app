@@ -19,24 +19,6 @@ class Activity:
     timestamp: datetime
     money: Money
 
-    def get_id(self) -> ActivityId:
-        return self.id
-
-    def get_owner_account_id(self) -> AccountId:
-        return self.owner_account_id
-
-    def get_target_account_id(self) -> AccountId:
-        return self.target_account_id
-
-    def get_source_account_id(self) -> AccountId:
-        return self.source_account_id
-
-    def get_money(self) -> Money:
-        return self.money
-
-    def get_timestamp(self) -> datetime:
-        return self.timestamp
-
     def __repr__(self) -> str:
         return (
             f"Activity(id={self.id!r}, owner_account_id={self.owner_account_id!r}, "

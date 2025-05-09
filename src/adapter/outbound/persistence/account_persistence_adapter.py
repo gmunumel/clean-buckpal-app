@@ -1,5 +1,4 @@
 from datetime import datetime
-from uuid import uuid4
 
 from src.application.domain.model.account import Account
 from src.application.domain.model.account_id import AccountId
@@ -19,7 +18,7 @@ from src.adapter.outbound.persistence.in_memory_data_account_repository import (
 from src.adapter.outbound.persistence.in_memory_data_activity_repository import (
     InMemoryDataActivityRepository,
 )
-from src.application.domain.model.activity_window import ActivityWindow
+from src.adapter.outbound.persistence.persistence_model import PersistenceMapper
 
 
 class AccountPersistenceAdapter(
@@ -63,18 +62,18 @@ class AccountPersistenceAdapter(
             account_id, baseline_date
         )
 
-        baseline_balance = Money.subtract(
-            Money.of(deposit_balance), Money.of(withdrawal_balance)
+        return PersistenceMapper.map_to_domain_entity(
+            account, activities, withdrawal_balance, deposit_balance
         )
 
-        account_id = account.get_id()
-        return Account.with_id(
-            AccountId(account_id.get_id()), baseline_balance, ActivityWindow(activities)
-        )
+    def update_accounts(self, accounts: list[Account]):
+        for account in accounts:
+            self._account_repository.update(account)
 
-    def update_activities(self, account: Account):
-        for activity in account.get_activity_window().get_activities():
-            if activity.get_id() is None:
+    def update_activities(self, accounts: list[Account]):
+        for account in accounts:
+            activity_window = account.activity_window
+            for activity in activity_window.activities:
                 self._activity_repository.save(activity)
 
     def list_account(self, account_id: AccountId | None) -> list[Account]:
@@ -93,24 +92,17 @@ class AccountPersistenceAdapter(
         activity = self._activity_repository.find_by_id(activity_id)
         return [activity] if activity else []
 
-    def insert_account(self, account_id: AccountId, money: Money) -> Account:
+    def insert_account(
+        self, account_id: AccountId, money: Money, activities=None
+    ) -> Account:
         account = self._account_repository.find_by_id(account_id)
         if account:
             raise ValueError(f"Account with ID {account_id} already saved.")
 
-        activity_window = ActivityWindow(
-            [
-                Activity(
-                    id=ActivityId(uuid4().int),
-                    owner_account_id=account_id,
-                    source_account_id=account_id,
-                    target_account_id=account_id,
-                    timestamp=datetime.now(),
-                    money=money,
-                )
-            ]
+        return self._account_repository.save(
+            PersistenceMapper.map_to_account_entity(account_id, money, activities or [])
         )
-        new_account = self._account_repository.save(
-            Account.with_id(account_id, money, activity_window)
-        )
-        return new_account
+
+    def clean_repositories(self):
+        self._account_repository.clear()
+        self._activity_repository.clear()

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from src.application.domain.model.account import Account
+from src.application.domain.model.activity import Activity
 from src.application.port.outbound.update_account_state_port import (
     UpdateAccountStatePort,
 )
@@ -48,7 +49,7 @@ class SendMoneyService(SendMoneyUseCase):
         self._update_account_state_port = update_account_state_port
         self._money_transfer_properties = money_transfer_properties
 
-    def send_money(self, send_money_command: SendMoneyCommand) -> bool:
+    def send_money(self, send_money_command: SendMoneyCommand) -> Activity:
         self._check_threshold(send_money_command)
 
         baseline_date = datetime.now() - timedelta(days=DAYS_BEFORE)
@@ -57,24 +58,22 @@ class SendMoneyService(SendMoneyUseCase):
             send_money_command, baseline_date
         )
 
-        self._validate_account_ids(source_account, target_account)
-
         try:
             self._lock_account(source_account)
-            money = send_money_command.get_money()
-            if not source_account.withdraw(money, target_account.get_id()):
+            money = send_money_command.money
+            if not source_account.withdraw(money, target_account.id):
                 raise WithdrawExceededException(money)
 
             self._lock_account(target_account)
-            target_account.deposit(money, source_account.get_id())
+            activity = target_account.deposit(money, source_account.id)
 
             self._update_account_states(source_account, target_account)
-            return True
+            return activity
         finally:
             self._release_accounts(source_account, target_account)
 
     def _check_threshold(self, send_money_command: SendMoneyCommand):
-        money = send_money_command.get_money()
+        money = send_money_command.money
         if money.is_greater_than(
             self._money_transfer_properties.max_transfer_threshold
         ):
@@ -87,26 +86,24 @@ class SendMoneyService(SendMoneyUseCase):
         self, send_money_command: SendMoneyCommand, baseline_date: datetime
     ) -> tuple[Account, Account]:
         source_account = self._load_account_port.load_account(
-            send_money_command.get_source_account_id(), baseline_date
+            send_money_command.source_account_id, baseline_date
         )
         target_account = self._load_account_port.load_account(
-            send_money_command.get_target_account_id(), baseline_date
+            send_money_command.target_account_id, baseline_date
         )
         return source_account, target_account
 
-    def _validate_account_ids(self, source_account: Account, target_account: Account):
-        if not source_account or source_account.get_id():
-            raise ValueError("Expected source account ID not to be empty")
-        if not target_account or target_account.get_id():
-            raise ValueError("Expected target account ID not to be empty")
-
     def _lock_account(self, account: Account):
-        self._account_lock.lock_account(account.get_id())
+        self._account_lock.lock_account(account.id)
 
     def _release_accounts(self, source_account: Account, target_account: Account):
-        self._account_lock.release_account(source_account.get_id())
-        self._account_lock.release_account(target_account.get_id())
+        self._account_lock.release_account(source_account.id)
+        self._account_lock.release_account(target_account.id)
 
     def _update_account_states(self, source_account: Account, target_account: Account):
-        self._update_account_state_port.update_activities(source_account)
-        self._update_account_state_port.update_activities(target_account)
+        self._update_account_state_port.update_accounts(
+            [source_account, target_account]
+        )
+        self._update_account_state_port.update_activities(
+            [source_account, target_account]
+        )

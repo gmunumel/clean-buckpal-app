@@ -10,13 +10,5 @@ class AccountId:
 
     id: int
 
-    def get_id(self) -> int:
-        return self.id
-
-    def __eq__(self, value: object) -> bool:
-        if not isinstance(value, AccountId):
-            return False
-        return self.get_id() == value.get_id()
-
     def __repr__(self) -> str:
         return f"AccountId({self.id!r})"

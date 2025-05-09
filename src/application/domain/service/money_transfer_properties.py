@@ -11,6 +11,8 @@ class MoneyTransferProperties:
     such as the maximum threshold that can be transferred in a single transaction.
     """
 
+    amount: float | None = None
+
     @property
     def max_transfer_threshold(self) -> Money:
-        return Money.of(1_000_000.0)
+        return Money.of(self.amount or 1_000_000)

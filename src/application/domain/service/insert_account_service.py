@@ -23,6 +23,6 @@ class InsertAccountService(InsertAccountUseCase):
 
     def insert_account(self, insert_account_command: InsertAccountCommand) -> Account:
         return self._insert_account_port.insert_account(
-            account_id=insert_account_command.get_account_id(),
-            money=insert_account_command.get_money(),
+            account_id=insert_account_command.account_id,
+            money=insert_account_command.money,
         )

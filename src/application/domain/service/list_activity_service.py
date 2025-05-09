@@ -19,4 +19,4 @@ class ListActivityService(ListActivityUseCase):
         self._list_activity_port = list_activity_port
 
     def list_activity(self, list_activity_query: ListActivityQuery) -> list[Activity]:
-        return self._list_activity_port.list_activity(list_activity_query.get_id())
+        return self._list_activity_port.list_activity(list_activity_query.activity_id)

@@ -1,8 +1,9 @@
 from src.application.port.inbound.insert_account_use_case import InsertAccountUseCase
-from src.application.port.inbound.insert_account_command import InsertAccountCommand
-from src.application.domain.model.account_id import AccountId
-from src.application.domain.model.money import Money
-from src.application.domain.model.account import Account
+from src.adapter.inbound.web.web_model import (
+    WebMapper,
+    InsertAccountRequest,
+    InsertAccountResponse,
+)
 
 
 class InsertAccountController:
@@ -18,8 +19,11 @@ class InsertAccountController:
     def __init__(self, insert_account_use_case: InsertAccountUseCase):
         self._insert_account_use_case = insert_account_use_case
 
-    def insert_account(self, account_id: int, money: float) -> Account:
-        insert_account_command = InsertAccountCommand(
-            AccountId(account_id), Money.of(money)
+    def insert_account(
+        self, insert_account_request: InsertAccountRequest
+    ) -> InsertAccountResponse:
+        insert_account_command = WebMapper.map_to_insert_account_command(
+            insert_account_request
         )
-        return self._insert_account_use_case.insert_account(insert_account_command)
+        account = self._insert_account_use_case.insert_account(insert_account_command)
+        return WebMapper.map_to_insert_account_entity(account)

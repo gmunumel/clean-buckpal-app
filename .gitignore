@@ -8,3 +8,6 @@ __pycache__
 *.pdb
 build
 dist
+.vscode
+.coverage
+.pytest_cache

@@ -39,10 +39,21 @@ class InMemoryDataAccountRepository(AbstractAccountRepository):
         return self._accounts
 
     def save(self, account: Account) -> Account:
-        if account.get_id() is None:
+        if account.id is None:
             raise ValueError("Account ID cannot be None.")
-        self._accounts[account.get_id()] = account
+        self._accounts[account.id] = account
         return account
+
+    def update(self, account: Account) -> Account:
+        if account.id is None:
+            raise ValueError("Account ID cannot be None.")
+        activity_window = self._accounts[account.id].activity_window
+        new_activity_window = account.activity_window
+        activity_window.activities.append(new_activity_window.activities[0])
+        return self._accounts[account.id]
 
     def find_by_id(self, account_id: AccountId) -> Account | None:
         return self._accounts.get(account_id)
+
+    def clear(self):
+        self._accounts.clear()

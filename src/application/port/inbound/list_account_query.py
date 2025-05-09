@@ -9,10 +9,7 @@ class ListAccountQuery:
     ListAccountQuery class representing a query to list accounts.
     """
 
-    id: AccountId | None = None
-
-    def get_id(self) -> AccountId | None:
-        return self.id
+    account_id: AccountId | None = None
 
     def __repr__(self) -> str:
-        return f"ListAccountQuery(id={self.id!r})"
+        return f"ListAccountQuery(account_id={self.account_id!r})"

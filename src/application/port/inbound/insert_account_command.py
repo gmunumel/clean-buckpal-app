@@ -19,12 +19,8 @@ class InsertAccountCommand:
             raise ValueError("Account ID must be provided.")
         if not self.money:
             raise ValueError("Money must be provided.")
-
-    def get_account_id(self) -> AccountId:
-        return self.account_id
-
-    def get_money(self) -> Money:
-        return self.money
+        if not self.money.is_positive():
+            raise ValueError("Money must be greater than zero.")
 
     def __repr__(self):
         return (
