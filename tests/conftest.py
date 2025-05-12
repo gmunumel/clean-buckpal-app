@@ -7,6 +7,8 @@ from src.application.domain.model.account import Account
 from src.application.domain.model.account_id import AccountId
 from src.application.domain.model.activity import Activity
 from src.application.domain.model.activity_id import ActivityId
+from src.application.domain.model.user import User
+from src.application.domain.model.user_id import UserId
 from src.app import app
 
 
@@ -37,3 +39,13 @@ def given_activity_with_id(mocker):
         return mocked_activity
 
     return _create_mocked_activity
+
+
+@pytest.fixture
+def given_user_with_id(mocker):
+    def _create_mocked_user(user_id: UserId):
+        mocked_user = mocker.Mock(spec=User)
+        mocked_user.id = user_id
+        return mocked_user
+
+    return _create_mocked_user

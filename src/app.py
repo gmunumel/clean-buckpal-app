@@ -4,24 +4,38 @@ from fastapi.responses import JSONResponse
 from src.common.container import Container
 from src.adapter.inbound.web import endpoints
 from src.common.log import logger
+from src.application.domain.service.validation_exception import ValidationException
+from src.application.domain.service.handlers import HANDLERS
 
 
 def create_app() -> FastAPI:
     container = Container()
     container.wire(modules=[__name__, "src.common.container"])
+    event_dispatcher = container.event_dispatcher()
+    event_dispatcher.subscribe(HANDLERS)
 
     fastapi_app = FastAPI()
     fastapi_app.container = container  # type: ignore
     fastapi_app.include_router(endpoints.router)
 
     @fastapi_app.exception_handler(ValueError)
-    async def value_error_handler(_request: Request, exc: ValueError,
-                                #   logger: Logger = Provide["logger"] # depedency injection
-                                  ):
+    async def value_error_handler(
+        _request: Request,
+        exc: ValueError,
+        #   logger: Logger = Provide["logger"] # depedency injection
+    ):
         logger.error("ValueError: %s", exc)
         return JSONResponse(
             status_code=400,
             content={"detail": str(exc)},
+        )
+
+    @fastapi_app.exception_handler(ValidationException)
+    async def validation_error_handler(_request: Request, exc: ValidationException):
+        logger.error("ValidationError: %s", exc)
+        return JSONResponse(
+            status_code=exc.args[0],
+            content={"detail": str(exc.args[1])},
         )
 
     @fastapi_app.exception_handler(Exception)

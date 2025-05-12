@@ -6,12 +6,18 @@ from src.application.domain.model.account_id import AccountId
 from src.application.domain.model.activity import Activity
 from src.application.domain.model.activity_id import ActivityId
 from src.application.domain.model.money import Money
+from src.application.domain.model.user_id import UserId
+from src.application.domain.model.name import Name
+from src.application.domain.model.user import User
+from src.application.domain.model.address import Address
 from src.application.port.inbound.get_account_balance_query import (
     GetAccountBalanceQuery,
 )
 from src.application.port.inbound.list_account_query import ListAccountQuery
 from src.application.port.inbound.list_activity_query import ListActivityQuery
+from src.application.port.inbound.list_user_query import ListUserQuery
 from src.application.port.inbound.insert_account_command import InsertAccountCommand
+from src.application.port.inbound.register_user_command import RegisterUserCommand
 
 
 class SendMoneyRequest(BaseModel):
@@ -32,9 +38,27 @@ class ListActivityParam(BaseModel):
     activity_id: int | None = None
 
 
+class ListUserParam(BaseModel):
+    user_id: int | None = None
+
+
 class InsertAccountRequest(BaseModel):
     account_id: int
     amount: float
+
+
+class AddressRequestResponse(BaseModel):
+    street_name: str
+    street_number: int
+    city: str
+    postal_code: str
+    country: str
+
+
+class RegisterUserRequest(BaseModel):
+    user_id: int
+    name: str
+    address: AddressRequestResponse
 
 
 class SendMoneyResponse(BaseModel):
@@ -58,6 +82,13 @@ class AccountResponse(BaseModel):
     activity_window: list[ActivityResponse]
 
 
+class UserResponse(BaseModel):
+    user_id: int
+    name: str
+    address: AddressRequestResponse
+    status: str
+
+
 class GetAccountBalanceResponse(BaseModel):
     account_id: int
     balance: float
@@ -70,6 +101,12 @@ class DepositMoneyResponse(BaseModel):
 
 class InsertAccountResponse(GetAccountBalanceResponse):
     pass
+
+
+class RegisterUserResponse(BaseModel):
+    user_id: int
+    name: str
+    address: AddressRequestResponse
 
 
 class WebMapper:
@@ -98,6 +135,14 @@ class WebMapper:
         return ListAccountQuery(account_id_or_none)
 
     @staticmethod
+    def map_to_list_user_query(
+        list_user_param: ListUserParam,
+    ) -> ListUserQuery:
+        user_id = list_user_param.user_id
+        user_id_or_none = UserId(user_id) if user_id else None
+        return ListUserQuery(user_id_or_none)
+
+    @staticmethod
     def map_to_list_activity_query(
         list_activity_param: ListActivityParam,
     ) -> ListActivityQuery:
@@ -112,6 +157,22 @@ class WebMapper:
         return InsertAccountCommand(
             AccountId(insert_account_request.account_id),
             Money.of(insert_account_request.amount),
+        )
+
+    @staticmethod
+    def map_to_register_user_command(
+        register_user_request: RegisterUserRequest,
+    ) -> RegisterUserCommand:
+        return RegisterUserCommand(
+            UserId(register_user_request.user_id),
+            Name(register_user_request.name),
+            Address(
+                street_name=register_user_request.address.street_name,
+                street_number=register_user_request.address.street_number,
+                city=register_user_request.address.city,
+                postal_code=register_user_request.address.postal_code,
+                country=register_user_request.address.country,
+            ),
         )
 
     @staticmethod
@@ -168,4 +229,38 @@ class WebMapper:
             source_account_id=activity_source_account_id.id,
             target_account_id=activity_target_account_id.id,
             amount=activity_money.amount,
+        )
+
+    @staticmethod
+    def map_to_register_user_entity(user: User) -> RegisterUserResponse:
+        user_id = user.id
+        user_name = user.name
+        address = user.address
+        return RegisterUserResponse(
+            user_id=user_id.id,
+            name=user_name.full_name,
+            address=WebMapper.map_to_address_entity(address),
+        )
+
+    @staticmethod
+    def map_to_address_entity(address: Address) -> AddressRequestResponse:
+        return AddressRequestResponse(
+            street_name=address.street_name,
+            street_number=address.street_number,
+            city=address.city,
+            postal_code=address.postal_code,
+            country=address.country,
+        )
+
+    @staticmethod
+    def map_to_user_entity(user: User) -> UserResponse:
+        user_id = user.id
+        user_name = user.name
+        address = user.address
+        status = user.status
+        return UserResponse(
+            user_id=user_id.id,
+            name=user_name.full_name,
+            address=WebMapper.map_to_address_entity(address),
+            status=str(status),
         )

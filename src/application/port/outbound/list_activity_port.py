@@ -13,5 +13,5 @@ class ListActivityPort(ABC):
     """
 
     @abstractmethod
-    def list_activity(self, activity_id: ActivityId | None) -> list[Activity]:
+    def list_activity(self, activity_id: ActivityId | None) -> list[Activity] | None:
         pass

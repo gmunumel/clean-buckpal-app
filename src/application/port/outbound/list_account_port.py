@@ -13,5 +13,5 @@ class ListAccountPort(ABC):
     """
 
     @abstractmethod
-    def list_account(self, account_id: AccountId | None) -> list[Account]:
+    def list_account(self, account_id: AccountId | None) -> list[Account] | None:
         pass

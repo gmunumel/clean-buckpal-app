@@ -3,6 +3,11 @@ from src.application.domain.model.account_id import AccountId
 from src.application.domain.model.activity import Activity
 from src.application.domain.model.money import Money
 from src.application.domain.model.activity_window import ActivityWindow
+from src.application.domain.model.user import User
+from src.application.domain.model.user_id import UserId
+from src.application.domain.model.name import Name
+from src.application.domain.model.address import Address
+from src.application.domain.model.status import Status
 
 
 class PersistenceMapper:
@@ -46,3 +51,9 @@ class PersistenceMapper:
                 )
             )
         return ActivityWindow(mapped_activities)
+
+    @staticmethod
+    def map_to_user_entity(
+        user_id: UserId, user_name: Name, address: Address, status: Status
+    ) -> User:
+        return User(id=user_id, name=user_name, address=address, status=status)

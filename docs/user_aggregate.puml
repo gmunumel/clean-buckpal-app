@@ -1,0 +1,49 @@
+@startuml
+package "Domain Model" {
+    class User {
+        - id: UserId
+        - name: Name
+        - address: Address
+        - status: Status
+        --
+        + __repr__(): str
+    }
+
+    class UserId {
+        - id: int
+        --
+        + __repr__(): str
+    }
+
+    class Name {
+        - first_name: str
+        - last_name: str
+        --
+        + full_name(): str
+        + __repr__(): str
+    }
+
+    class Address {
+        - street: str
+        - city: str
+        - state: str
+        - zip_code: str
+        --
+        + __repr__(): str
+    }
+
+    class Status {
+        - status: str
+        --
+        + enable(): Status
+        + disable(): Status
+        + is_enabled(): bool
+        + __repr__(): str
+    }
+
+    User --> UserId
+    User --> Name
+    User --> Address
+    User --> Status
+}
+@enduml

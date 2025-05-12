@@ -1,0 +1,412 @@
+openapi: 3.0.0
+info:
+  title: Clean Buckpal App
+  description: OpenAPI schema for the Clean Buckpal App
+  version: 1.0.0
+paths:
+  /send-money:
+    post:
+      summary: Send Money
+      operationId: send_money_send_money_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMoneyRequest"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SendMoneyResponse"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /account:
+    get:
+      summary: Get Account
+      operationId: get_account_account_get
+      parameters:
+        - name: account_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            nullable: true
+            title: Account Id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AccountResponse"
+                title: Response Get Account Account Get
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+    post:
+      summary: Create Account
+      operationId: create_account_account_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InsertAccountRequest"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InsertAccountResponse"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /activity:
+    get:
+      summary: Get Activity
+      operationId: get_activity_activity_get
+      parameters:
+        - name: activity_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            nullable: true
+            title: Activity Id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityResponse"
+                title: Response Get Activity Activity Get
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /account-balance/{account_id}:
+    get:
+      summary: Get Account Balance
+      operationId: get_account_balance_account_balance__account_id__get
+      parameters:
+        - name: account_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Account Id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAccountBalanceResponse"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /user:
+    post:
+      summary: Register User
+      operationId: register_user_user_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserRequest"
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterUserResponse"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+    get:
+      summary: Get User
+      operationId: get_user_user_get
+      parameters:
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            nullable: true
+            title: User Id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserResponse"
+                title: Response Get User User Get
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+components:
+  schemas:
+    AccountResponse:
+      properties:
+        account_id:
+          type: integer
+          title: Account Id
+        baseline_balance:
+          type: number
+          title: Baseline Balance
+        activity_window:
+          items:
+            $ref: "#/components/schemas/ActivityResponse"
+          type: array
+          title: Activity Window
+      type: object
+      required:
+        - account_id
+        - baseline_balance
+        - activity_window
+      title: AccountResponse
+    ActivityResponse:
+      properties:
+        activity_id:
+          type: integer
+          nullable: true
+          title: Activity Id
+        owner_account_id:
+          type: integer
+          title: Owner Account Id
+        source_account_id:
+          type: integer
+          title: Source Account Id
+        target_account_id:
+          type: integer
+          title: Target Account Id
+        timestamp:
+          type: string
+          title: Timestamp
+        money:
+          type: number
+          title: Money
+      type: object
+      required:
+        - activity_id
+        - owner_account_id
+        - source_account_id
+        - target_account_id
+        - timestamp
+        - money
+      title: ActivityResponse
+    AddressRequestResponse:
+      properties:
+        street_name:
+          type: string
+          title: Street Name
+        street_number:
+          type: integer
+          title: Street Number
+        city:
+          type: string
+          title: City
+        postal_code:
+          type: string
+          title: Postal Code
+        country:
+          type: string
+          title: Country
+      type: object
+      required:
+        - street_name
+        - street_number
+        - city
+        - postal_code
+        - country
+      title: AddressRequestResponse
+    GetAccountBalanceResponse:
+      properties:
+        account_id:
+          type: integer
+          title: Account Id
+        balance:
+          type: number
+          title: Balance
+      type: object
+      required:
+        - account_id
+        - balance
+      title: GetAccountBalanceResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: "#/components/schemas/ValidationError"
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    InsertAccountRequest:
+      properties:
+        account_id:
+          type: integer
+          title: Account Id
+        amount:
+          type: number
+          title: Amount
+      type: object
+      required:
+        - account_id
+        - amount
+      title: InsertAccountRequest
+    InsertAccountResponse:
+      properties:
+        account_id:
+          type: integer
+          title: Account Id
+        balance:
+          type: number
+          title: Balance
+      type: object
+      required:
+        - account_id
+        - balance
+      title: InsertAccountResponse
+    RegisterUserRequest:
+      properties:
+        user_id:
+          type: integer
+          title: User Id
+        name:
+          type: string
+          title: Name
+        address:
+          $ref: "#/components/schemas/AddressRequestResponse"
+      type: object
+      required:
+        - user_id
+        - name
+        - address
+      title: RegisterUserRequest
+    RegisterUserResponse:
+      properties:
+        user_id:
+          type: integer
+          title: User Id
+        name:
+          type: string
+          title: Name
+        address:
+          $ref: "#/components/schemas/AddressRequestResponse"
+      type: object
+      required:
+        - user_id
+        - name
+        - address
+      title: RegisterUserResponse
+    SendMoneyRequest:
+      properties:
+        source_account_id:
+          type: integer
+          title: Source Account Id
+        target_account_id:
+          type: integer
+          title: Target Account Id
+        amount:
+          type: number
+          title: Amount
+      type: object
+      required:
+        - source_account_id
+        - target_account_id
+        - amount
+      title: SendMoneyRequest
+    SendMoneyResponse:
+      properties:
+        source_account_id:
+          type: integer
+          title: Source Account Id
+        target_account_id:
+          type: integer
+          title: Target Account Id
+        amount:
+          type: number
+          title: Amount
+      type: object
+      required:
+        - source_account_id
+        - target_account_id
+        - amount
+      title: SendMoneyResponse
+    UserResponse:
+      properties:
+        user_id:
+          type: integer
+          title: User Id
+        name:
+          type: string
+          title: Name
+        address:
+          $ref: "#/components/schemas/AddressRequestResponse"
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+        - user_id
+        - name
+        - address
+        - status
+      title: UserResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError

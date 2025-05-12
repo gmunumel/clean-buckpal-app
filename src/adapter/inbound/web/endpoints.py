@@ -12,6 +12,12 @@ from src.adapter.inbound.web.get_account_balance_controller import (
 from src.adapter.inbound.web.insert_account_controller import (
     InsertAccountController,
 )
+from src.adapter.inbound.web.register_user_controller import (
+    RegisterUserController,
+)
+from src.adapter.inbound.web.list_user_controller import (
+    ListUserController,
+)
 from src.adapter.inbound.web.web_model import (
     SendMoneyRequest,
     GetAccountBalanceParam,
@@ -23,6 +29,10 @@ from src.adapter.inbound.web.web_model import (
     GetAccountBalanceResponse,
     InsertAccountRequest,
     InsertAccountResponse,
+    RegisterUserRequest,
+    RegisterUserResponse,
+    ListUserParam,
+    UserResponse,
 )
 
 
@@ -83,3 +93,24 @@ async def create_account(
     ),
 ):
     return controller.insert_account(request)
+
+
+@router.post("/user", response_model=RegisterUserResponse)
+@inject
+async def register_user(
+    request: RegisterUserRequest,
+    controller: RegisterUserController = Depends(
+        Provide[Container.register_user_controller]
+    ),
+):
+    return controller.register_user(request)
+
+
+@router.get("/user", response_model=list[UserResponse])
+@inject
+async def get_user(
+    user_id: int | None = None,
+    controller: ListUserController = Depends(Provide[Container.list_user_controller]),
+):
+    query_param = ListUserParam(user_id=user_id)
+    return controller.list_user(query_param)

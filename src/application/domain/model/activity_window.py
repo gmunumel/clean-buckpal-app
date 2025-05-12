@@ -42,3 +42,6 @@ class ActivityWindow:
             if activity.source_account_id == account_id:
                 withdraw_balance = Money.add(withdraw_balance, activity.money)
         return withdraw_balance
+
+    def __repr__(self) -> str:
+        return f"ActivityWindow(activities={self.activities!r})"

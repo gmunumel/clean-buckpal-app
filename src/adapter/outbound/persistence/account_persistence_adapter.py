@@ -76,21 +76,21 @@ class AccountPersistenceAdapter(
             for activity in activity_window.activities:
                 self._activity_repository.save(activity)
 
-    def list_account(self, account_id: AccountId | None) -> list[Account]:
+    def list_account(self, account_id: AccountId | None) -> list[Account] | None:
         if account_id is None:
             dict_accounts = self._account_repository.get_accounts()
             return list(dict_accounts.values())
 
         account = self._account_repository.find_by_id(account_id)
-        return [account] if account else []
+        return [account] if account else None
 
-    def list_activity(self, activity_id: ActivityId | None) -> list[Activity]:
+    def list_activity(self, activity_id: ActivityId | None) -> list[Activity] | None:
         if activity_id is None:
             dict_activities = self._activity_repository.get_activities()
             return list(dict_activities.values())
 
         activity = self._activity_repository.find_by_id(activity_id)
-        return [activity] if activity else []
+        return [activity] if activity else None
 
     def insert_account(
         self, account_id: AccountId, money: Money, activities=None

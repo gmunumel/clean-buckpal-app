@@ -1,4 +1,5 @@
 from src.application.domain.model.account import Account
+from src.application.domain.service.validation_exception import ValidationException
 from src.application.port.inbound.list_account_query import ListAccountQuery
 from src.application.port.inbound.list_account_use_case import ListAccountUseCase
 from src.application.port.outbound.list_account_port import ListAccountPort
@@ -19,4 +20,7 @@ class ListAccountService(ListAccountUseCase):
         self._list_acount_port = list_account_port
 
     def list_account(self, list_account_query: ListAccountQuery) -> list[Account]:
-        return self._list_acount_port.list_account(list_account_query.account_id)
+        accounts = self._list_acount_port.list_account(list_account_query.account_id)
+        if accounts is None:
+            raise ValidationException(404, "Account not found")
+        return accounts

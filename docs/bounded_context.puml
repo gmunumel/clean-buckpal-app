@@ -1,0 +1,9 @@
+@startuml
+package "Bounded Contexts" {
+    usecase Account as "Account Bounded Context"
+    usecase User as "User Bounded Context"
+}
+
+Account --> User : "Notifies events (e.g., UserRegisteredEvent)"
+User --> Account : "Depends on Account for user-related operations"
+@enduml

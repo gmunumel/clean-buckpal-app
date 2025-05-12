@@ -8,6 +8,8 @@ from src.adapter.inbound.web.get_account_balance_controller import (
     GetAccountBalanceController,
 )
 from src.adapter.inbound.web.insert_account_controller import InsertAccountController
+from src.adapter.inbound.web.register_user_controller import RegisterUserController
+from src.adapter.inbound.web.list_user_controller import ListUserController
 from src.application.domain.service.money_transfer_properties import (
     MoneyTransferProperties,
 )
@@ -17,7 +19,10 @@ from src.application.domain.service.list_activity_service import ListActivitySer
 from src.application.domain.service.get_account_balance_service import (
     GetAccountBalanceService,
 )
+from src.application.domain.service.register_user_service import RegisterUserService
+from src.application.domain.service.list_user_service import ListUserService
 from src.application.domain.service.insert_account_service import InsertAccountService
+from src.application.domain.service.event_dispatcher import EventDispatcher
 from src.adapter.outbound.persistence.in_memory_data_account_repository import (
     InMemoryDataAccountRepository,
 )
@@ -27,14 +32,25 @@ from src.adapter.outbound.persistence.in_memory_data_activity_repository import 
 from src.adapter.outbound.persistence.in_memory_account_lock import (
     InMemoryAccountLock,
 )
+from src.adapter.outbound.persistence.in_memory_data_user_repository import (
+    InMemoryDataUserRepository,
+)
 from src.adapter.outbound.persistence.account_persistence_adapter import (
     AccountPersistenceAdapter,
 )
+from src.adapter.outbound.persistence.user_persistence_adapter import (
+    UserPersistenceAdapter,
+)
+from src.application.domain.model.event import UserRegisteredEvent
+from src.application.domain.service.handlers import handle_user_registered_event
 
 
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
-        modules=["src.adapter.inbound.web.endpoints"]
+        modules=[
+            "src.adapter.inbound.web.endpoints",
+            # "src.application.domain.service.handlers",
+        ]
     )
 
     # Outbound adapters
@@ -44,39 +60,54 @@ class Container(containers.DeclarativeContainer):
     in_memory_data_activity_repository = providers.Singleton(
         InMemoryDataActivityRepository
     )
+    in_memory_data_user_repository = providers.Singleton(InMemoryDataUserRepository)
     account_lock = providers.Singleton(InMemoryAccountLock)
 
     # Persistence adapter
-    persistence_adapter = providers.Singleton(
+    persistence_adapter_account = providers.Singleton(
         AccountPersistenceAdapter,
         account_repository=in_memory_data_account_repository,
         activity_repository=in_memory_data_activity_repository,
     )
+    persistence_adapter_user = providers.Singleton(
+        UserPersistenceAdapter,
+        user_repository=in_memory_data_user_repository,
+    )
+    event_dispatcher = providers.Singleton(EventDispatcher)
 
     # Domain services
     money_transfer_properties = providers.Factory(MoneyTransferProperties)
     send_money_service = providers.Factory(
         SendMoneyService,
-        load_account_port=persistence_adapter,
+        load_account_port=persistence_adapter_account,
         account_lock=account_lock,
-        update_account_state_port=persistence_adapter,
+        update_account_state_port=persistence_adapter_account,
         money_transfer_properties=money_transfer_properties,
     )
     list_account_service = providers.Factory(
         ListAccountService,
-        list_account_port=persistence_adapter,
+        list_account_port=persistence_adapter_account,
     )
     list_activity_service = providers.Factory(
         ListActivityService,
-        list_activity_port=persistence_adapter,
+        list_activity_port=persistence_adapter_account,
     )
     get_account_balance_service = providers.Factory(
         GetAccountBalanceService,
-        load_account_port=persistence_adapter,
+        load_account_port=persistence_adapter_account,
     )
     insert_account_service = providers.Factory(
         InsertAccountService,
-        insert_account_port=persistence_adapter,
+        insert_account_port=persistence_adapter_account,
+    )
+    list_user_service = providers.Factory(
+        ListUserService,
+        list_user_port=persistence_adapter_user,
+    )
+    register_user_service = providers.Factory(
+        RegisterUserService,
+        register_user_port=persistence_adapter_user,
+        event_dispatcher=event_dispatcher,
     )
 
     # Controllers
@@ -99,4 +130,12 @@ class Container(containers.DeclarativeContainer):
     insert_account_controller = providers.Factory(
         InsertAccountController,
         insert_account_use_case=insert_account_service,
+    )
+    list_user_controller = providers.Factory(
+        ListUserController,
+        list_user_use_case=list_user_service,
+    )
+    register_user_controller = providers.Factory(
+        RegisterUserController,
+        register_user_use_case=register_user_service,
     )

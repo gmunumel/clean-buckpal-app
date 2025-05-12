@@ -1,0 +1,69 @@
+@startuml
+package "Domain Model" {
+    class Account {
+        - id: AccountId
+        - baseline_balance: Money
+        - activity_window: ActivityWindow
+        --
+        + with_id(account_id: AccountId, baseline_balance: Money, activity_window: ActivityWindow): Account
+        + calculate_balance(): Money
+        + withdraw(money: Money, target_account_id: AccountId): bool
+        + deposit(money: Money, source_account_id: AccountId): Activity
+        + may_withdraw(money: Money): bool
+    }
+
+    class AccountId {
+        - id: int
+        --
+        + __repr__(): str
+    }
+
+    class Money {
+        - amount: float
+        --
+        + add(money: Money, other: Money): Money
+        + subtract(money: Money, other: Money): Money
+        + of(amount: float): Money
+        + zero(): Money
+        + is_positive(): bool
+        + is_positive_or_zero(): bool
+        + negate(): Money
+        + is_greater_than(money: Money): bool
+        + __repr__(): str
+    }
+
+    class ActivityWindow {
+        - activities: List[Activity]
+        --
+        + add_activity(activity: Activity)
+        + get_start_timestamp(): datetime
+        + get_end_timestamp(): datetime
+        + calculate_balance(account_id: AccountId): Money
+    }
+
+    class Activity {
+        - id: ActivityId
+        - owner_account_id: AccountId
+        - source_account_id: AccountId
+        - target_account_id: AccountId
+        - timestamp: datetime
+        - money: Money
+        --
+        + __repr__(): str
+    }
+
+    class ActivityId {
+        - id: int
+        --
+        + __repr__(): str
+    }
+
+    Account --> AccountId
+    Account --> Money
+    Account --> ActivityWindow
+    ActivityWindow --> Activity
+    Activity --> ActivityId
+    Activity --> AccountId
+    Activity --> Money
+}
+@enduml
