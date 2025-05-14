@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.common.container import Container
 from src.adapter.inbound.web import endpoints
@@ -16,6 +17,14 @@ def create_app() -> FastAPI:
 
     fastapi_app = FastAPI()
     fastapi_app.container = container  # type: ignore
+    # Allow all origins (for development)
+    fastapi_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Or specify your frontend URL: ["http://localhost:8000"]
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     fastapi_app.include_router(endpoints.router)
 
     @fastapi_app.exception_handler(ValueError)
