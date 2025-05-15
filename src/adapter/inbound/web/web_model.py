@@ -16,7 +16,7 @@ from src.application.port.inbound.get_account_balance_query import (
 from src.application.port.inbound.list_account_query import ListAccountQuery
 from src.application.port.inbound.list_activity_query import ListActivityQuery
 from src.application.port.inbound.list_user_query import ListUserQuery
-from src.application.port.inbound.insert_account_command import InsertAccountCommand
+from src.application.port.inbound.update_account_command import UpdateAccountCommand
 from src.application.port.inbound.register_user_command import RegisterUserCommand
 
 
@@ -42,8 +42,7 @@ class ListUserParam(BaseModel):
     user_id: int | None = None
 
 
-class InsertAccountRequest(BaseModel):
-    account_id: int
+class UpdateAccountRequest(BaseModel):
     amount: float
 
 
@@ -99,7 +98,7 @@ class DepositMoneyResponse(BaseModel):
     amount: float
 
 
-class InsertAccountResponse(GetAccountBalanceResponse):
+class UpdateAccountResponse(GetAccountBalanceResponse):
     pass
 
 
@@ -151,12 +150,12 @@ class WebMapper:
         return ListActivityQuery(activity_id_or_none)
 
     @staticmethod
-    def map_to_insert_account_command(
-        insert_account_request: InsertAccountRequest,
-    ) -> InsertAccountCommand:
-        return InsertAccountCommand(
-            AccountId(insert_account_request.account_id),
-            Money.of(insert_account_request.amount),
+    def map_to_update_account_command(account_id: int,
+        update_account_request: UpdateAccountRequest,
+    ) -> UpdateAccountCommand:
+        return UpdateAccountCommand(
+            AccountId(account_id),
+            Money.of(update_account_request.amount),
         )
 
     @staticmethod
@@ -215,10 +214,10 @@ class WebMapper:
         )
 
     @staticmethod
-    def map_to_insert_account_entity(account: Account) -> InsertAccountResponse:
+    def map_to_update_account_entity(account: Account) -> UpdateAccountResponse:
         account_id = account.id
         balance = account.baseline_balance
-        return InsertAccountResponse(account_id=account_id.id, balance=balance.amount)
+        return UpdateAccountResponse(account_id=account_id.id, balance=balance.amount)
 
     @staticmethod
     def map_to_send_money_entity(activity: Activity) -> SendMoneyResponse:

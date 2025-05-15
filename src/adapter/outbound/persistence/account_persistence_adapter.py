@@ -11,7 +11,7 @@ from src.application.port.outbound.update_account_state_port import (
 from src.application.port.outbound.load_account_port import LoadAccountPort
 from src.application.port.outbound.list_account_port import ListAccountPort
 from src.application.port.outbound.list_activity_port import ListActivityPort
-from src.application.port.outbound.insert_account_port import InsertAccountPort
+from src.application.port.outbound.update_account_port import UpdateAccountPort
 from src.adapter.outbound.persistence.in_memory_data_account_repository import (
     InMemoryDataAccountRepository,
 )
@@ -25,7 +25,7 @@ class AccountPersistenceAdapter(
     LoadAccountPort,
     ListAccountPort,
     ListActivityPort,
-    InsertAccountPort,
+    UpdateAccountPort,
     UpdateAccountStatePort,
 ):
     """
@@ -92,12 +92,14 @@ class AccountPersistenceAdapter(
         activity = self._activity_repository.find_by_id(activity_id)
         return [activity] if activity else None
 
-    def insert_account(
+    def update_account(
         self, account_id: AccountId, money: Money, activities=None
-    ) -> Account:
+    ) -> Account | dict:
         account = self._account_repository.find_by_id(account_id)
         if account:
-            raise ValueError(f"Account with ID {account_id} already saved.")
+            account.baseline_balance = money
+            self._account_repository.save(account)
+            return {}
 
         return self._account_repository.save(
             PersistenceMapper.map_to_account_entity(account_id, money, activities or [])

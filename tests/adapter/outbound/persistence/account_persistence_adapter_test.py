@@ -67,12 +67,12 @@ def adapter_under_test(activity_repository, account_repository):
 
 
 def test_account_persistence_adapter_loads_account(adapter_under_test):
-    account_1 = adapter_under_test.insert_account(
+    account_1 = adapter_under_test.update_account(
         AccountId(1),
         Money.of(0),
         [ACTIVITY_1, ACTIVITY_3],
     )
-    account_2 = adapter_under_test.insert_account(
+    account_2 = adapter_under_test.update_account(
         AccountId(2),
         Money.of(0),
         [ACTIVITY_2, ACTIVITY_4],

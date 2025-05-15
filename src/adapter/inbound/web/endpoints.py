@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Response, status, Depends
 from dependency_injector.wiring import Provide, inject
 
 from src.common.container import Container
@@ -9,8 +9,8 @@ from src.adapter.inbound.web.list_activity_controller import ListActivityControl
 from src.adapter.inbound.web.get_account_balance_controller import (
     GetAccountBalanceController,
 )
-from src.adapter.inbound.web.insert_account_controller import (
-    InsertAccountController,
+from src.adapter.inbound.web.update_account_controller import (
+    UpdateAccountController,
 )
 from src.adapter.inbound.web.register_user_controller import (
     RegisterUserController,
@@ -27,8 +27,8 @@ from src.adapter.inbound.web.web_model import (
     SendMoneyResponse,
     ActivityResponse,
     GetAccountBalanceResponse,
-    InsertAccountRequest,
-    InsertAccountResponse,
+    UpdateAccountRequest,
+    UpdateAccountResponse,
     RegisterUserRequest,
     RegisterUserResponse,
     ListUserParam,
@@ -84,15 +84,25 @@ async def get_account_balance(
     return controller.get_account_balance(path_param)
 
 
-@router.post("/account", response_model=InsertAccountResponse)
+@router.put(
+    "/account/{account_id}",
+    response_model=UpdateAccountResponse | dict,
+    status_code=201,
+)
 @inject
-async def create_account(
-    request: InsertAccountRequest,
-    controller: InsertAccountController = Depends(
-        Provide[Container.insert_account_controller]
+async def create_or_update_account(
+    account_id: int,
+    request: UpdateAccountRequest,
+    response: Response,
+    controller: UpdateAccountController = Depends(
+        Provide[Container.update_account_controller]
     ),
 ):
-    return controller.insert_account(request)
+    account = controller.update_account(account_id, request)
+    if account:
+        return account
+    response.status_code = status.HTTP_204_NO_CONTENT
+    return {}
 
 
 @router.post("/user", response_model=RegisterUserResponse)

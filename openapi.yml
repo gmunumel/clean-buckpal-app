@@ -1,8 +1,7 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
-  title: Clean Buckpal App
-  description: OpenAPI schema for the Clean Buckpal App
-  version: 1.0.0
+  title: FastAPI
+  version: 0.1.0
 paths:
   /send-money:
     post:
@@ -55,28 +54,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-    post:
-      summary: Create Account
-      operationId: create_account_account_post
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/InsertAccountRequest"
-      responses:
-        "200":
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InsertAccountResponse"
-        "422":
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HTTPValidationError"
   /activity:
     get:
       summary: Get Activity
@@ -123,6 +100,39 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetAccountBalanceResponse"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /account/{account_id}:
+    put:
+      summary: Create Or Update Account
+      operationId: create_or_update_account_account__account_id__put
+      parameters:
+        - name: account_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Account Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAccountRequest"
+      responses:
+        "201":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: "#/components/schemas/UpdateAccountResponse"
+                  - type: object
+                title: Response Create Or Update Account Account  Account Id  Put
         "422":
           description: Validation Error
           content:
@@ -277,32 +287,6 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
-    InsertAccountRequest:
-      properties:
-        account_id:
-          type: integer
-          title: Account Id
-        amount:
-          type: number
-          title: Amount
-      type: object
-      required:
-        - account_id
-        - amount
-      title: InsertAccountRequest
-    InsertAccountResponse:
-      properties:
-        account_id:
-          type: integer
-          title: Account Id
-        balance:
-          type: number
-          title: Balance
-      type: object
-      required:
-        - account_id
-        - balance
-      title: InsertAccountResponse
     RegisterUserRequest:
       properties:
         user_id:
@@ -369,6 +353,28 @@ components:
         - target_account_id
         - amount
       title: SendMoneyResponse
+    UpdateAccountRequest:
+      properties:
+        amount:
+          type: number
+          title: Amount
+      type: object
+      required:
+        - amount
+      title: UpdateAccountRequest
+    UpdateAccountResponse:
+      properties:
+        account_id:
+          type: integer
+          title: Account Id
+        balance:
+          type: number
+          title: Balance
+      type: object
+      required:
+        - account_id
+        - balance
+      title: UpdateAccountResponse
     UserResponse:
       properties:
         user_id:
