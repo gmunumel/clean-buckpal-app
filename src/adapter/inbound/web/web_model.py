@@ -43,7 +43,7 @@ class ListUserParam(BaseModel):
 
 
 class UpdateAccountRequest(BaseModel):
-    amount: float
+    baseline_balance: float
 
 
 class AddressRequestResponse(BaseModel):
@@ -96,10 +96,6 @@ class GetAccountBalanceResponse(BaseModel):
 class DepositMoneyResponse(BaseModel):
     account_id: int
     amount: float
-
-
-class UpdateAccountResponse(GetAccountBalanceResponse):
-    pass
 
 
 class RegisterUserResponse(BaseModel):
@@ -156,7 +152,7 @@ class WebMapper:
     ) -> UpdateAccountCommand:
         return UpdateAccountCommand(
             AccountId(account_id),
-            Money.of(update_account_request.amount),
+            Money.of(update_account_request.baseline_balance),
         )
 
     @staticmethod
@@ -213,12 +209,6 @@ class WebMapper:
         return GetAccountBalanceResponse(
             account_id=account_id, balance=account_balance.amount
         )
-
-    @staticmethod
-    def map_to_update_account_entity(account: Account) -> UpdateAccountResponse:
-        account_id = account.id
-        balance = account.baseline_balance
-        return UpdateAccountResponse(account_id=account_id.id, balance=balance.amount)
 
     @staticmethod
     def map_to_send_money_entity(activity: Activity) -> SendMoneyResponse:

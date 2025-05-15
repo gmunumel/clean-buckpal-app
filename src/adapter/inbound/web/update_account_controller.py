@@ -2,7 +2,7 @@ from src.application.port.inbound.update_account_use_case import UpdateAccountUs
 from src.adapter.inbound.web.web_model import (
     WebMapper,
     UpdateAccountRequest,
-    UpdateAccountResponse,
+    AccountResponse,
 )
 from src.application.domain.model.account import Account
 
@@ -22,11 +22,11 @@ class UpdateAccountController:
 
     def update_account(
         self, account_id: int, update_account_request: UpdateAccountRequest
-    ) -> UpdateAccountResponse | dict[str, object]:
+    ) -> AccountResponse | dict[str, object]:
         update_account_command = WebMapper.map_to_update_account_command(
             account_id, update_account_request
         )
         account = self._update_account_use_case.update_account(update_account_command)
         if isinstance(account, Account):
-            return WebMapper.map_to_update_account_entity(account)
+            return WebMapper.map_to_account_entity(account)
         return {}

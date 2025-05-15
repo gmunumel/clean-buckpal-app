@@ -28,7 +28,6 @@ from src.adapter.inbound.web.web_model import (
     ActivityResponse,
     GetAccountBalanceResponse,
     UpdateAccountRequest,
-    UpdateAccountResponse,
     RegisterUserRequest,
     RegisterUserResponse,
     ListUserParam,
@@ -86,7 +85,7 @@ async def get_account_balance(
 
 @router.put(
     "/accounts/{account_id}",
-    response_model=UpdateAccountResponse | dict,
+    response_model=AccountResponse | dict,
     status_code=201,
 )
 @inject
@@ -97,7 +96,7 @@ async def create_or_update_account(
     controller: UpdateAccountController = Depends(
         Provide[Container.update_account_controller]
     ),
-) -> UpdateAccountResponse | dict[str, object]:
+) -> AccountResponse | dict[str, object]:
     account = controller.update_account(account_id, request)
     if account:
         return account
