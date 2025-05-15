@@ -1,11 +1,7 @@
 from dependency_injector.wiring import inject
 
 from src.application.port.inbound.send_money_use_case import SendMoneyUseCase
-from src.adapter.inbound.web.web_model import (
-    WebMapper,
-    SendMoneyRequest,
-    SendMoneyResponse,
-)
+from src.adapter.inbound.web.web_model import WebMapper, SendMoneyRequestResponse
 from src.common.log import logger
 
 
@@ -23,7 +19,9 @@ class SendMoneyController:
     def __init__(self, send_money_use_case: SendMoneyUseCase):
         self._send_money_use_case = send_money_use_case
 
-    def send_money(self, send_money_request: SendMoneyRequest) -> SendMoneyResponse:
+    def send_money(
+        self, send_money_request: SendMoneyRequestResponse
+    ) -> SendMoneyRequestResponse:
         logger.info("Processing send money request: %s", send_money_request)
         send_money_command = WebMapper.map_to_send_money_command(send_money_request)
         activity = self._send_money_use_case.send_money(send_money_command)

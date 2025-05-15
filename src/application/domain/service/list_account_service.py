@@ -22,5 +22,5 @@ class ListAccountService(ListAccountUseCase):
     def list_account(self, list_account_query: ListAccountQuery) -> list[Account]:
         accounts = self._list_acount_port.list_account(list_account_query.account_id)
         if accounts is None:
-            raise ValidationException(404, "Account not found")
+            raise ValidationException(404, "Account not found.")
         return accounts

@@ -3,6 +3,8 @@ package "Domain Model" {
     class User {
         - id: UserId
         - name: Name
+        - email: Email
+        - password: Password
         - address: Address
         - status: Status
         --
@@ -16,11 +18,23 @@ package "Domain Model" {
     }
 
     class Name {
-        - first_name: str
-        - last_name: str
+        - full_name: str
         --
-        + full_name(): str
         + __repr__(): str
+    }
+
+    class Email {
+        - address: str
+        --
+        + __repr__(): str
+    }
+
+    class Password {
+        - plain: str = None
+        - hashed: str = None
+        --
+        + hash(): Password
+        + verify(plain: str): Password
     }
 
     class Address {
@@ -43,6 +57,8 @@ package "Domain Model" {
 
     User --> UserId
     User --> Name
+    User --> Email
+    User --> Password
     User --> Address
     User --> Status
 }

@@ -9,6 +9,7 @@ from src.adapter.inbound.web.get_account_balance_controller import (
 )
 from src.adapter.inbound.web.update_account_controller import UpdateAccountController
 from src.adapter.inbound.web.register_user_controller import RegisterUserController
+from src.adapter.inbound.web.login_user_controller import LoginUserController
 from src.adapter.inbound.web.list_user_controller import ListUserController
 from src.application.domain.service.money_transfer_properties import (
     MoneyTransferProperties,
@@ -20,6 +21,7 @@ from src.application.domain.service.get_account_balance_service import (
     GetAccountBalanceService,
 )
 from src.application.domain.service.register_user_service import RegisterUserService
+from src.application.domain.service.login_user_service import LoginUserService
 from src.application.domain.service.list_user_service import ListUserService
 from src.application.domain.service.update_account_service import UpdateAccountService
 from src.application.domain.service.event_dispatcher import EventDispatcher
@@ -29,9 +31,7 @@ from src.adapter.outbound.persistence.in_memory_data_account_repository import (
 from src.adapter.outbound.persistence.in_memory_data_activity_repository import (
     InMemoryDataActivityRepository,
 )
-from src.adapter.outbound.persistence.in_memory_account_lock import (
-    InMemoryAccountLock,
-)
+from src.adapter.outbound.persistence.in_memory_account_lock import InMemoryAccountLock
 from src.adapter.outbound.persistence.in_memory_data_user_repository import (
     InMemoryDataUserRepository,
 )
@@ -107,6 +107,10 @@ class Container(containers.DeclarativeContainer):
         register_user_port=persistence_adapter_user,
         event_dispatcher=event_dispatcher,
     )
+    login_user_service = providers.Factory(
+        LoginUserService,
+        login_user_port=persistence_adapter_user,
+    )
 
     # Controllers
     send_money_controller = providers.Factory(
@@ -136,4 +140,8 @@ class Container(containers.DeclarativeContainer):
     register_user_controller = providers.Factory(
         RegisterUserController,
         register_user_use_case=register_user_service,
+    )
+    login_user_controller = providers.Factory(
+        LoginUserController,
+        login_user_use_case=login_user_service,
     )

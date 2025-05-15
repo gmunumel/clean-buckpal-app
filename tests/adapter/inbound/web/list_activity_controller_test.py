@@ -12,4 +12,4 @@ async def test_list_activity(client):
 async def test_list_activity_not_found(client):
     response = await client.get("/activities?activity_id=42")
     assert response.status_code == 404
-    assert response.json() == {"detail": "Activity not found"}
+    assert response.json() == {"detail": "Activity not found."}

@@ -3,6 +3,7 @@ from typing import Dict
 
 from src.application.domain.model.user import User
 from src.application.domain.model.user_id import UserId
+from src.application.domain.model.email import Email
 
 
 class AbstractUserRepository(ABC):
@@ -21,6 +22,10 @@ class AbstractUserRepository(ABC):
 
     @abstractmethod
     def find_by_id(self, user_id: UserId) -> User | None:
+        pass
+
+    @abstractmethod
+    def find_by_email(self, user_email: Email) -> User | None:
         pass
 
 
@@ -44,6 +49,12 @@ class InMemoryDataUserRepository(AbstractUserRepository):
 
     def find_by_id(self, user_id: UserId) -> User | None:
         return self._users.get(user_id)
+
+    def find_by_email(self, user_email: Email) -> User | None:
+        for user in self._users.values():
+            if user.email == user_email:
+                return user
+        return None
 
     def clear(self):
         self._users.clear()

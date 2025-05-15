@@ -24,5 +24,5 @@ class ListActivityService(ListActivityUseCase):
             list_activity_query.activity_id
         )
         if activities is None:
-            raise ValidationException(404, "Activity not found")
+            raise ValidationException(404, "Activity not found.")
         return activities

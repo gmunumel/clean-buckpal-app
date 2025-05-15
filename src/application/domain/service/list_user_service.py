@@ -22,5 +22,5 @@ class ListUserService(ListUserUseCase):
     def list_user(self, list_user_query: ListUserQuery) -> list[User]:
         users = self._list_acount_port.list_user(list_user_query.user_id)
         if users is None:
-            raise ValidationException(404, "User not found")
+            raise ValidationException(404, "User not found.")
         return users

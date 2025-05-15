@@ -1,6 +1,4 @@
 from src.application.port.inbound.register_user_use_case import RegisterUserUseCase
-
-
 from src.adapter.inbound.web.web_model import (
     WebMapper,
     RegisterUserRequest,

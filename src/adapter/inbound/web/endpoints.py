@@ -2,29 +2,22 @@ from fastapi import APIRouter, Response, status, Depends
 from dependency_injector.wiring import Provide, inject
 
 from src.common.container import Container
-
 from src.adapter.inbound.web.send_money_controller import SendMoneyController
 from src.adapter.inbound.web.list_account_controller import ListAccountController
 from src.adapter.inbound.web.list_activity_controller import ListActivityController
 from src.adapter.inbound.web.get_account_balance_controller import (
     GetAccountBalanceController,
 )
-from src.adapter.inbound.web.update_account_controller import (
-    UpdateAccountController,
-)
-from src.adapter.inbound.web.register_user_controller import (
-    RegisterUserController,
-)
-from src.adapter.inbound.web.list_user_controller import (
-    ListUserController,
-)
+from src.adapter.inbound.web.update_account_controller import UpdateAccountController
+from src.adapter.inbound.web.register_user_controller import RegisterUserController
+from src.adapter.inbound.web.login_user_controller import LoginUserController
+from src.adapter.inbound.web.list_user_controller import ListUserController
 from src.adapter.inbound.web.web_model import (
-    SendMoneyRequest,
     GetAccountBalanceParam,
     ListAccountParam,
     ListActivityParam,
     AccountResponse,
-    SendMoneyResponse,
+    SendMoneyRequestResponse,
     ActivityResponse,
     GetAccountBalanceResponse,
     UpdateAccountRequest,
@@ -32,16 +25,18 @@ from src.adapter.inbound.web.web_model import (
     RegisterUserResponse,
     ListUserParam,
     UserResponse,
+    LoginUserRequest,
+    LoginUserResponse,
 )
 
 
 router = APIRouter()
 
 
-@router.post("/send-money", response_model=SendMoneyResponse)
+@router.post("/send-money", response_model=SendMoneyRequestResponse)
 @inject
 async def send_money(
-    request: SendMoneyRequest,
+    request: SendMoneyRequestResponse,
     controller: SendMoneyController = Depends(Provide[Container.send_money_controller]),
 ):
     return controller.send_money(request)
@@ -123,3 +118,12 @@ async def get_user(
 ):
     query_param = ListUserParam(user_id=user_id)
     return controller.list_user(query_param)
+
+
+@router.post("/login", response_model=LoginUserResponse)
+@inject
+async def login(
+    request: LoginUserRequest,
+    controller: LoginUserController = Depends(Provide[Container.login_user_controller]),
+):
+    return controller.login_user(request)

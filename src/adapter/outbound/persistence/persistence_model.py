@@ -10,6 +10,8 @@ from src.application.domain.model.user_id import UserId
 from src.application.domain.model.name import Name
 from src.application.domain.model.address import Address
 from src.application.domain.model.status import Status
+from src.application.domain.model.email import Email
+from src.application.domain.model.password import Password
 
 
 class PersistenceMapper:
@@ -56,6 +58,18 @@ class PersistenceMapper:
 
     @staticmethod
     def map_to_user_entity(
-        user_id: UserId, user_name: Name, address: Address, status: Status
+        user_id: UserId,
+        user_name: Name,
+        user_email: Email,
+        user_password: Password,
+        address: Address,
+        status: Status,
     ) -> User:
-        return User(id=user_id, name=user_name, address=address, status=status)
+        return User(
+            id=user_id,
+            name=user_name,
+            email=user_email,
+            password=user_password,
+            address=address,
+            status=status,
+        )

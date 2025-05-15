@@ -9,6 +9,8 @@ from src.application.domain.model.money import Money
 from src.application.domain.model.user_id import UserId
 from src.application.domain.model.name import Name
 from src.application.domain.model.user import User
+from src.application.domain.model.email import Email
+from src.application.domain.model.password import Password
 from src.application.domain.model.address import Address
 from src.application.port.inbound.get_account_balance_query import (
     GetAccountBalanceQuery,
@@ -18,12 +20,7 @@ from src.application.port.inbound.list_activity_query import ListActivityQuery
 from src.application.port.inbound.list_user_query import ListUserQuery
 from src.application.port.inbound.update_account_command import UpdateAccountCommand
 from src.application.port.inbound.register_user_command import RegisterUserCommand
-
-
-class SendMoneyRequest(BaseModel):
-    source_account_id: int
-    target_account_id: int
-    amount: float
+from src.application.port.inbound.login_user_command import LoginUserCommand
 
 
 class GetAccountBalanceParam(BaseModel):
@@ -54,13 +51,20 @@ class AddressRequestResponse(BaseModel):
     country: str
 
 
+class LoginUserRequest(BaseModel):
+    email: str
+    password: str
+
+
 class RegisterUserRequest(BaseModel):
     user_id: int
     name: str
+    email: str
+    password: str
     address: AddressRequestResponse
 
 
-class SendMoneyResponse(BaseModel):
+class SendMoneyRequestResponse(BaseModel):
     source_account_id: int
     target_account_id: int
     amount: float
@@ -84,8 +88,14 @@ class AccountResponse(BaseModel):
 class UserResponse(BaseModel):
     user_id: int
     name: str
+    email: str
     address: AddressRequestResponse
     status: str
+
+
+class LoginUserResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
 
 
 class GetAccountBalanceResponse(BaseModel):
@@ -98,16 +108,14 @@ class DepositMoneyResponse(BaseModel):
     amount: float
 
 
-class RegisterUserResponse(BaseModel):
-    user_id: int
-    name: str
-    address: AddressRequestResponse
+class RegisterUserResponse(UserResponse):
+    pass
 
 
 class WebMapper:
     @staticmethod
     def map_to_send_money_command(
-        send_money_request: SendMoneyRequest,
+        send_money_request: SendMoneyRequestResponse,
     ) -> SendMoneyCommand:
         return SendMoneyCommand(
             source_account_id=AccountId(send_money_request.source_account_id),
@@ -160,15 +168,26 @@ class WebMapper:
         register_user_request: RegisterUserRequest,
     ) -> RegisterUserCommand:
         return RegisterUserCommand(
-            UserId(register_user_request.user_id),
-            Name(register_user_request.name),
-            Address(
+            user_id=UserId(register_user_request.user_id),
+            user_name=Name(register_user_request.name),
+            user_email=Email(register_user_request.email),
+            user_password=Password(register_user_request.password),
+            user_address=Address(
                 street_name=register_user_request.address.street_name,
                 street_number=register_user_request.address.street_number,
                 city=register_user_request.address.city,
                 postal_code=register_user_request.address.postal_code,
                 country=register_user_request.address.country,
             ),
+        )
+
+    @staticmethod
+    def map_to_login_user_command(
+        login_user_request: LoginUserRequest,
+    ) -> LoginUserCommand:
+        return LoginUserCommand(
+            Email(login_user_request.email),
+            Password(login_user_request.password),
         )
 
     @staticmethod
@@ -211,11 +230,11 @@ class WebMapper:
         )
 
     @staticmethod
-    def map_to_send_money_entity(activity: Activity) -> SendMoneyResponse:
+    def map_to_send_money_entity(activity: Activity) -> SendMoneyRequestResponse:
         activity_source_account_id = activity.source_account_id
         activity_target_account_id = activity.target_account_id
         activity_money = activity.money
-        return SendMoneyResponse(
+        return SendMoneyRequestResponse(
             source_account_id=activity_source_account_id.id,
             target_account_id=activity_target_account_id.id,
             amount=activity_money.amount,
@@ -225,11 +244,21 @@ class WebMapper:
     def map_to_register_user_entity(user: User) -> RegisterUserResponse:
         user_id = user.id
         user_name = user.name
+        user_email = user.email
         address = user.address
+        status = user.status
         return RegisterUserResponse(
             user_id=user_id.id,
             name=user_name.full_name,
+            email=user_email.address,
             address=WebMapper.map_to_address_entity(address),
+            status=str(status),
+        )
+
+    @staticmethod
+    def map_to_login_user_entity(access_token: str) -> LoginUserResponse:
+        return LoginUserResponse(
+            access_token=access_token,
         )
 
     @staticmethod
@@ -246,11 +275,13 @@ class WebMapper:
     def map_to_user_entity(user: User) -> UserResponse:
         user_id = user.id
         user_name = user.name
+        user_email = user.email
         address = user.address
         status = user.status
         return UserResponse(
             user_id=user_id.id,
             name=user_name.full_name,
+            email=user_email.address,
             address=WebMapper.map_to_address_entity(address),
             status=str(status),
         )

@@ -6,12 +6,15 @@ from src.application.domain.model.name import Name
 from src.application.domain.model.address import Address
 from src.application.domain.model.user import User
 from src.application.domain.model.status import Status
+from src.application.domain.model.email import Email
+from src.application.domain.model.password import Password
 from src.adapter.outbound.persistence.persistence_model import PersistenceMapper
 from src.application.port.outbound.register_user_port import RegisterUserPort
 from src.application.port.outbound.list_user_port import ListUserPort
+from src.application.port.outbound.login_user_port import LoginUserPort
 
 
-class UserPersistenceAdapter(RegisterUserPort, ListUserPort):
+class UserPersistenceAdapter(RegisterUserPort, ListUserPort, LoginUserPort):
     """
     Persistence adapter for registering a user.
     This adapter interacts with the in-memory data repository to
@@ -24,7 +27,13 @@ class UserPersistenceAdapter(RegisterUserPort, ListUserPort):
         self._user_repository = user_repository
 
     def register_user(
-        self, user_id: UserId, user_name: Name, user_address: Address, status: Status
+        self,
+        user_id: UserId,
+        user_name: Name,
+        user_email: Email,
+        user_password: Password,
+        user_address: Address,
+        status: Status,
     ) -> User:
         user = self._user_repository.find_by_id(user_id)
         if user:
@@ -34,6 +43,8 @@ class UserPersistenceAdapter(RegisterUserPort, ListUserPort):
             PersistenceMapper.map_to_user_entity(
                 user_id=user_id,
                 user_name=user_name,
+                user_email=user_email,
+                user_password=user_password.hash(),
                 address=user_address,
                 status=status,
             )
@@ -46,3 +57,6 @@ class UserPersistenceAdapter(RegisterUserPort, ListUserPort):
 
         user = self._user_repository.find_by_id(user_id)
         return [user] if user else None
+
+    def login_user(self, email: Email) -> User | None:
+        return self._user_repository.find_by_email(email)

@@ -25,6 +25,8 @@ class RegisterUserService(RegisterUserUseCase):
         user = self._register_user_port.register_user(
             user_id=user_management_command.user_id,
             user_name=user_management_command.user_name,
+            user_email=user_management_command.user_email,
+            user_password=user_management_command.user_password,
             user_address=user_management_command.user_address,
             status=Status.enable(),
         )

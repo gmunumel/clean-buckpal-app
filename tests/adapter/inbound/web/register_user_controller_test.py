@@ -5,9 +5,9 @@ from src.application.domain.model.user_id import UserId
 from src.application.domain.model.name import Name
 from src.application.domain.model.address import Address
 from src.application.domain.model.status import Status
-from src.application.port.inbound.register_user_use_case import (
-    RegisterUserUseCase,
-)
+from src.application.domain.model.email import Email
+from src.application.domain.model.password import Password
+from src.application.port.inbound.register_user_use_case import RegisterUserUseCase
 from src.adapter.inbound.web.register_user_controller import RegisterUserController
 from src.application.port.inbound.register_user_command import RegisterUserCommand
 from src.app import app
@@ -19,6 +19,8 @@ def mock_register_user_use_case(mocker):
     mock_register_user_use_case.register_user.return_value = User(
         id=UserId(1),
         name=Name("foo"),
+        email=Email("foo@example.com"),
+        password=Password("secret"),
         address=Address(
             street_name="bar",
             street_number=42,
@@ -36,6 +38,8 @@ async def test_register_user(client, mock_register_user_use_case):
     payload = {
         "user_id": 1,
         "name": "foo",
+        "email": "foo@example.com",
+        "password": "secret",
         "address": {
             "street_name": "bar",
             "street_number": 42,
@@ -55,6 +59,8 @@ async def test_register_user(client, mock_register_user_use_case):
         RegisterUserCommand(
             user_id=UserId(1),
             user_name=Name("foo"),
+            user_email=Email("foo@example.com"),
+            user_password=Password("secret"),
             user_address=Address(
                 street_name="bar",
                 street_number=42,
