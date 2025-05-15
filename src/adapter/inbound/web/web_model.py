@@ -150,7 +150,8 @@ class WebMapper:
         return ListActivityQuery(activity_id_or_none)
 
     @staticmethod
-    def map_to_update_account_command(account_id: int,
+    def map_to_update_account_command(
+        account_id: int,
         update_account_request: UpdateAccountRequest,
     ) -> UpdateAccountCommand:
         return UpdateAccountCommand(
@@ -178,7 +179,7 @@ class WebMapper:
     def map_to_account_entity(account: Account) -> AccountResponse:
         account_id = account.id
         activity_windows = account.activity_window
-        activities = []
+        activities: list[ActivityResponse] = []
         for activity in activity_windows.activities:
             activities.append(WebMapper.map_to_activity_entity(activity))
         account_baseline_balance = account.baseline_balance

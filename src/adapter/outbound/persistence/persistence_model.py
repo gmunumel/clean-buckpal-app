@@ -1,3 +1,5 @@
+from typing import List
+
 from src.application.domain.model.account import Account
 from src.application.domain.model.account_id import AccountId
 from src.application.domain.model.activity import Activity
@@ -38,7 +40,7 @@ class PersistenceMapper:
 
     @staticmethod
     def map_to_activity_window(activities: list[Activity]) -> ActivityWindow:
-        mapped_activities = []
+        mapped_activities: List[Activity] = []
         for activity in activities:
             mapped_activities.append(
                 Activity(

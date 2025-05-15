@@ -93,8 +93,11 @@ class AccountPersistenceAdapter(
         return [activity] if activity else None
 
     def update_account(
-        self, account_id: AccountId, money: Money, activities=None
-    ) -> Account | dict:
+        self,
+        account_id: AccountId,
+        money: Money,
+        activities: list[Activity] | None = None,
+    ) -> Account | dict[str, object]:
         account = self._account_repository.find_by_id(account_id)
         if account:
             account.baseline_balance = money

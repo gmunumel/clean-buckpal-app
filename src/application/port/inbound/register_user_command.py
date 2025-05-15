@@ -16,10 +16,7 @@ class RegisterUserCommand:
     user_address: Address
 
     def __post_init__(self):
-        if not isinstance(self.user_name, Name):
-            raise TypeError(f"Expected Name, got {type(self.user_name).__name__}")
-        if not isinstance(self.user_address, Address):
-            raise TypeError(f"Expected Address, got {type(self.user_address).__name__}")
+        pass
 
     def __repr__(self) -> str:
         return (

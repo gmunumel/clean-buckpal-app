@@ -97,7 +97,7 @@ async def create_or_update_account(
     controller: UpdateAccountController = Depends(
         Provide[Container.update_account_controller]
     ),
-):
+) -> UpdateAccountResponse | dict[str, object]:
     account = controller.update_account(account_id, request)
     if account:
         return account

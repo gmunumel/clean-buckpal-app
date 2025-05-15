@@ -10,5 +10,5 @@ class UpdateAccountUseCase(ABC):
     @abstractmethod
     def update_account(
         self, update_account_command: UpdateAccountCommand
-    ) -> Account | dict:
+    ) -> Account | dict[str, object]:
         pass

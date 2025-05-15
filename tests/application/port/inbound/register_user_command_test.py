@@ -1,5 +1,3 @@
-import pytest
-
 from src.application.port.inbound.register_user_command import RegisterUserCommand
 from src.application.domain.model.user_id import UserId
 from src.application.domain.model.name import Name

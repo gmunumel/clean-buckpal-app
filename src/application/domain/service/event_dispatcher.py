@@ -14,15 +14,15 @@ class EventDispatcher:
     """
 
     def __init__(self):
-        self._subscribers: Dict[Type, List[Callable]] = {}
+        self._subscribers: Dict[Type[Event], List[Callable[[Event], None]]] = {}
 
-    def subscribe(self, handlers: Dict[Type[Event], List[Callable]]):
+    def subscribe(self, handlers: Dict[Type[Event], List[Callable[[Event], None]]]):
         handlers_dict_items = handlers.items()
         for event_type, handler_list in handlers_dict_items:
             if event_type not in self._subscribers:
                 self._subscribers[event_type] = []
             self._subscribers[event_type].extend(handler_list)
 
-    def publish(self, event):
+    def publish(self, event: Event):
         for handler in self._subscribers.get(type(event), []):
             handler(event)

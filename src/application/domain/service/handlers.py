@@ -13,14 +13,17 @@ from src.common.log import logger
 
 @inject
 def handle_user_registered_event(
-    event: UserRegisteredEvent,
+    event: Event,
     update_account_service: UpdateAccountService = Provide["update_account_service"],
 ):
+    if not isinstance(event, UserRegisteredEvent):
+        logger.error("Received wrong event type: %s", type(event))
+        return
     logger.info("UserRegisteredEvent received for user_id: %s", event.user_id)
     update_account_command = UpdateAccountCommand(AccountId(event.user_id), Money.of(0))
     update_account_service.update_account(update_account_command)
 
 
-HANDLERS: Dict[Type[Event], List[Callable]] = {
+HANDLERS: Dict[Type[Event], List[Callable[[Event], None]]] = {
     UserRegisteredEvent: [handle_user_registered_event],
 }

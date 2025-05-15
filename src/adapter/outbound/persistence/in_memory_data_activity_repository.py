@@ -60,8 +60,6 @@ class InMemoryDataActivityRepository(AbstractActivityRepository):
 
     def save(self, activity: Activity):
         activity_id = activity.id
-        if activity_id is None:
-            raise ValueError("Activity ID cannot be None.")
         self._activities[activity_id] = activity
 
     def find_by_id(self, activity_id: ActivityId) -> Activity | None:

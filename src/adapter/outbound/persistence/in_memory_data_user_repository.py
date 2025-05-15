@@ -39,8 +39,6 @@ class InMemoryDataUserRepository(AbstractUserRepository):
         return self._users
 
     def save(self, user: User) -> User:
-        if user.id is None:
-            raise ValueError("User ID cannot be None.")
         self._users[user.id] = user
         return user
 

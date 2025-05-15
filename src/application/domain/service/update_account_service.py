@@ -24,7 +24,7 @@ class UpdateAccountService(UpdateAccountUseCase):
 
     def update_account(
         self, update_account_command: UpdateAccountCommand
-    ) -> Account | dict:
+    ) -> Account | dict[str, object]:
         return self._update_account_port.update_account(
             account_id=update_account_command.account_id,
             money=update_account_command.money,

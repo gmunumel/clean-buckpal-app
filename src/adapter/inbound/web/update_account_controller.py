@@ -4,6 +4,7 @@ from src.adapter.inbound.web.web_model import (
     UpdateAccountRequest,
     UpdateAccountResponse,
 )
+from src.application.domain.model.account import Account
 
 
 class UpdateAccountController:
@@ -21,11 +22,11 @@ class UpdateAccountController:
 
     def update_account(
         self, account_id: int, update_account_request: UpdateAccountRequest
-    ) -> UpdateAccountResponse | dict:
+    ) -> UpdateAccountResponse | dict[str, object]:
         update_account_command = WebMapper.map_to_update_account_command(
             account_id, update_account_request
         )
         account = self._update_account_use_case.update_account(update_account_command)
-        if account:
+        if isinstance(account, Account):
             return WebMapper.map_to_update_account_entity(account)
         return {}

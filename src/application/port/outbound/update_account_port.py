@@ -13,5 +13,7 @@ class UpdateAccountPort(ABC):
     """
 
     @abstractmethod
-    def update_account(self, account_id: AccountId, money: Money) -> Account | dict:
+    def update_account(
+        self, account_id: AccountId, money: Money
+    ) -> Account | dict[str, object]:
         pass

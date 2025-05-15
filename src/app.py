@@ -28,7 +28,7 @@ def create_app() -> FastAPI:
     fastapi_app.include_router(endpoints.router)
 
     @fastapi_app.exception_handler(ValueError)
-    async def value_error_handler(
+    async def _value_error_handler(
         _request: Request,
         exc: ValueError,
         #   logger: Logger = Provide["logger"] # depedency injection
@@ -40,7 +40,7 @@ def create_app() -> FastAPI:
         )
 
     @fastapi_app.exception_handler(ValidationException)
-    async def validation_error_handler(_request: Request, exc: ValidationException):
+    async def _validation_error_handler(_request: Request, exc: ValidationException):
         logger.error("ValidationError: %s", exc)
         return JSONResponse(
             status_code=exc.args[0],
@@ -48,7 +48,7 @@ def create_app() -> FastAPI:
         )
 
     @fastapi_app.exception_handler(Exception)
-    async def generic_exception_handler(_request: Request, exc: Exception):
+    async def _generic_exception_handler(_request: Request, exc: Exception):
         logger.error("Unhandled Exception: %s", exc)
         return JSONResponse(
             status_code=500,
