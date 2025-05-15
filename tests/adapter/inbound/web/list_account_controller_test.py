@@ -3,14 +3,14 @@ import pytest
 
 @pytest.mark.asyncio
 async def test_list_account(client):
-    response = await client.get("/account")
+    response = await client.get("/accounts")
     assert response.status_code == 200
     assert response.json() == []
 
 
 @pytest.mark.asyncio
 async def test_list_account_not_found(client):
-    response = await client.get("/account?account_id=42")
+    response = await client.get("/accounts?account_id=42")
     assert response.status_code == 404
     assert response.json() == {"detail": "Account not found"}
 

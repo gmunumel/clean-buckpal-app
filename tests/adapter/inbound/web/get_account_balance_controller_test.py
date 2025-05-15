@@ -26,7 +26,7 @@ async def test_get_account_balance(client, mock_get_account_balance_use_case):
     with app.container.get_account_balance_controller.override(  # type: ignore
         GetAccountBalanceController(mock_get_account_balance_use_case)
     ):
-        response = await client.get("/account-balance/42")
+        response = await client.get("/accounts-balance/42")
 
     assert response.status_code == 200
 

@@ -28,7 +28,7 @@ async def test_update_account(client, mock_update_account_use_case):
     with app.container.update_account_controller.override(  # type: ignore
         UpdateAccountController(mock_update_account_use_case)
     ):
-        response = await client.put("/account/42", json={"amount": 42})
+        response = await client.put("/accounts/42", json={"amount": 42})
 
     assert response.status_code == 201
 

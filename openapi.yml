@@ -26,7 +26,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /account:
+  /accounts:
     get:
       summary: Get Account
       operationId: get_account_account_get
@@ -54,7 +54,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /activity:
+  /activities:
     get:
       summary: Get Activity
       operationId: get_activity_activity_get
@@ -82,7 +82,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /account-balance/{account_id}:
+  /accounts-balance/{account_id}:
     get:
       summary: Get Account Balance
       operationId: get_account_balance_account_balance__account_id__get
@@ -106,7 +106,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /account/{account_id}:
+  /accounts/{account_id}:
     put:
       summary: Create Or Update Account
       operationId: create_or_update_account_account__account_id__put
@@ -139,7 +139,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /user:
+  /users:
     post:
       summary: Register User
       operationId: register_user_user_post

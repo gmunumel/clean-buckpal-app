@@ -47,7 +47,7 @@ async def test_register_user(client, mock_register_user_use_case):
     with app.container.register_user_controller.override(  # type: ignore
         RegisterUserController(mock_register_user_use_case)
     ):
-        response = await client.post("/user", json=payload)
+        response = await client.post("/users", json=payload)
 
     assert response.status_code == 200
 

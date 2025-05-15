@@ -48,7 +48,7 @@ async def send_money(
     return controller.send_money(request)
 
 
-@router.get("/account", response_model=list[AccountResponse])
+@router.get("/accounts", response_model=list[AccountResponse])
 @inject
 async def get_account(
     account_id: int | None = None,
@@ -60,7 +60,7 @@ async def get_account(
     return controller.list_account(query_param)
 
 
-@router.get("/activity", response_model=list[ActivityResponse])
+@router.get("/activities", response_model=list[ActivityResponse])
 @inject
 async def get_activity(
     activity_id: int | None = None,
@@ -72,7 +72,7 @@ async def get_activity(
     return controller.list_activity(query_params)
 
 
-@router.get("/account-balance/{account_id}", response_model=GetAccountBalanceResponse)
+@router.get("/accounts-balance/{account_id}", response_model=GetAccountBalanceResponse)
 @inject
 async def get_account_balance(
     account_id: int,
@@ -85,7 +85,7 @@ async def get_account_balance(
 
 
 @router.put(
-    "/account/{account_id}",
+    "/accounts/{account_id}",
     response_model=UpdateAccountResponse | dict,
     status_code=201,
 )
@@ -105,7 +105,7 @@ async def create_or_update_account(
     return {}
 
 
-@router.post("/user", response_model=RegisterUserResponse)
+@router.post("/users", response_model=RegisterUserResponse)
 @inject
 async def register_user(
     request: RegisterUserRequest,
@@ -116,7 +116,7 @@ async def register_user(
     return controller.register_user(request)
 
 
-@router.get("/user", response_model=list[UserResponse])
+@router.get("/users", response_model=list[UserResponse])
 @inject
 async def get_user(
     user_id: int | None = None,
