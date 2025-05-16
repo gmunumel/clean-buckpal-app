@@ -1,6 +1,5 @@
 dependency-injector==4.46.0
 fastapi==0.115.12
-passlib==1.7.4
 pydantic==2.10.6
 python-dotenv==1.1.0
 python-jose==3.4.0
