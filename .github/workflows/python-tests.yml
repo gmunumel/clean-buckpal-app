@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install fastapi dependency-injector pydantic pytest passlib coverage pytest-mock httpx pytest-asyncio
+          pip install fastapi dependency-injector pydantic pytest passlib coverage pytest-mock httpx pytest-asyncio python-jose
 
       - name: Run tests with pytest
         run: |
