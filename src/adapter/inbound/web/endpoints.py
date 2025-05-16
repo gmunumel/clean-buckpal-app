@@ -2,6 +2,7 @@ from fastapi import APIRouter, Response, status, Depends
 from dependency_injector.wiring import Provide, inject
 
 from src.common.container import Container
+from src.application.domain.model.user import User
 from src.adapter.inbound.web.send_money_controller import SendMoneyController
 from src.adapter.inbound.web.list_account_controller import ListAccountController
 from src.adapter.inbound.web.list_activity_controller import ListActivityController
@@ -12,6 +13,7 @@ from src.adapter.inbound.web.update_account_controller import UpdateAccountContr
 from src.adapter.inbound.web.register_user_controller import RegisterUserController
 from src.adapter.inbound.web.login_user_controller import LoginUserController
 from src.adapter.inbound.web.list_user_controller import ListUserController
+from src.adapter.inbound.web.jwt_utils import authenticate_user
 from src.adapter.inbound.web.web_model import (
     GetAccountBalanceParam,
     ListAccountParam,
@@ -38,6 +40,7 @@ router = APIRouter()
 async def send_money(
     request: SendMoneyRequestResponse,
     controller: SendMoneyController = Depends(Provide[Container.send_money_controller]),
+    _authenticate_user: User = Depends(authenticate_user),
 ):
     return controller.send_money(request)
 
@@ -49,6 +52,7 @@ async def get_account(
     controller: ListAccountController = Depends(
         Provide[Container.list_account_controller]
     ),
+    _authenticate_user: User = Depends(authenticate_user),
 ):
     query_param = ListAccountParam(account_id=account_id)
     return controller.list_account(query_param)
@@ -61,6 +65,7 @@ async def get_activity(
     controller: ListActivityController = Depends(
         Provide[Container.list_activity_controller]
     ),
+    _authenticate_user: User = Depends(authenticate_user),
 ):
     query_params = ListActivityParam(activity_id=activity_id)
     return controller.list_activity(query_params)
@@ -73,6 +78,7 @@ async def get_account_balance(
     controller: GetAccountBalanceController = Depends(
         Provide[Container.get_account_balance_controller]
     ),
+    _authenticate_user: User = Depends(authenticate_user),
 ):
     path_param = GetAccountBalanceParam(account_id=account_id)
     return controller.get_account_balance(path_param)
@@ -91,6 +97,7 @@ async def create_or_update_account(
     controller: UpdateAccountController = Depends(
         Provide[Container.update_account_controller]
     ),
+    _authenticate_user: User = Depends(authenticate_user),
 ) -> AccountResponse | dict[str, object]:
     account = controller.update_account(account_id, request)
     if account:
@@ -115,6 +122,7 @@ async def register_user(
 async def get_user(
     user_id: int | None = None,
     controller: ListUserController = Depends(Provide[Container.list_user_controller]),
+    _authenticate_user: User = Depends(authenticate_user),
 ):
     query_param = ListUserParam(user_id=user_id)
     return controller.list_user(query_param)

@@ -3,13 +3,15 @@ import pytest_asyncio
 
 from httpx import ASGITransport, AsyncClient
 
+from src.app import app
 from src.application.domain.model.account import Account
 from src.application.domain.model.account_id import AccountId
 from src.application.domain.model.activity import Activity
 from src.application.domain.model.activity_id import ActivityId
 from src.application.domain.model.user import User
 from src.application.domain.model.user_id import UserId
-from src.app import app
+from src.adapter.inbound.web.jwt_utils import create_jwt_token
+from src.common.config import DUMMY_USER
 
 
 @pytest_asyncio.fixture
@@ -49,3 +51,9 @@ def given_user_with_id(mocker):
         return mocked_user
 
     return _create_mocked_user
+
+
+@pytest.fixture
+def auth_header():
+    token = create_jwt_token(DUMMY_USER)
+    return {"Authorization": f"Bearer {token}"}

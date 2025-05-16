@@ -19,8 +19,8 @@ class UpdateAccountCommand:
             raise ValueError("Account ID must be provided.")
         if not self.money:
             raise ValueError("Money must be provided.")
-        if not self.money.is_positive_or_zero():
-            raise ValueError("Money must be greater than zero.")
+        if not self.money.is_positive():
+            raise ValueError("Money amount must be greater than zero.")
 
     def __repr__(self):
         return (

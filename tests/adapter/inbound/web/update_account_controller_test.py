@@ -24,11 +24,13 @@ def mock_update_account_use_case(mocker):
 
 
 @pytest.mark.asyncio
-async def test_update_account(client, mock_update_account_use_case):
+async def test_update_account(client, mock_update_account_use_case, auth_header):
     with app.container.update_account_controller.override(  # type: ignore
         UpdateAccountController(mock_update_account_use_case)
     ):
-        response = await client.put("/accounts/42", json={"baseline_balance": 42})
+        response = await client.put(
+            "/accounts/42", json={"baseline_balance": 42}, headers=auth_header
+        )
 
     assert response.status_code == 201
 

@@ -4,7 +4,7 @@ from src.adapter.inbound.web.web_model import (
     LoginUserRequest,
     LoginUserResponse,
 )
-from src.common.jwt_utils import create_jwt_token
+from src.adapter.inbound.web.jwt_utils import create_jwt_token
 
 
 class LoginUserController:

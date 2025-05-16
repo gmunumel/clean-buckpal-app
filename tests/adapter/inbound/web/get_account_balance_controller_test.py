@@ -22,11 +22,14 @@ def mock_get_account_balance_use_case(mocker):
 
 
 @pytest.mark.asyncio
-async def test_get_account_balance(client, mock_get_account_balance_use_case):
+async def test_get_account_balance(
+    client, mock_get_account_balance_use_case, auth_header
+):
     with app.container.get_account_balance_controller.override(  # type: ignore
         GetAccountBalanceController(mock_get_account_balance_use_case)
     ):
-        response = await client.get("/accounts-balance/42")
+        print("auth_header", auth_header)
+        response = await client.get("/accounts-balance/42", headers=auth_header)
 
     assert response.status_code == 200
 

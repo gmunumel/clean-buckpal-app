@@ -29,13 +29,14 @@ def mock_send_money_use_case(mocker):
 
 
 @pytest.mark.asyncio
-async def test_send_money(client, mock_send_money_use_case):
+async def test_send_money(client, mock_send_money_use_case, auth_header):
     with app.container.send_money_controller.override(  # type: ignore
         SendMoneyController(mock_send_money_use_case)
     ):
         response = await client.post(
             "/send-money",
             json={"source_account_id": 41, "target_account_id": 42, "amount": 42},
+            headers=auth_header,
         )
 
     assert response.status_code == 200
@@ -50,10 +51,11 @@ async def test_send_money(client, mock_send_money_use_case):
 
 
 @pytest.mark.asyncio
-async def test_send_money_failed(client):
+async def test_send_money_failed(client, auth_header):
     response = await client.post(
         "/send-money",
         json={"source_account_id": 41, "target_account_id": 42, "amount": 42},
+        headers=auth_header,
     )
 
     assert response.status_code == 400

@@ -11,7 +11,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SendMoneyRequest"
+              $ref: "#/components/schemas/SendMoneyRequestResponse"
         required: true
       responses:
         "200":
@@ -19,17 +19,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SendMoneyResponse"
+                $ref: "#/components/schemas/SendMoneyRequestResponse"
         "422":
           description: Validation Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
+      security:
+        - HTTPBearer: []
   /accounts:
     get:
       summary: Get Account
-      operationId: get_account_account_get
+      operationId: get_account_accounts_get
+      security:
+        - HTTPBearer: []
       parameters:
         - name: account_id
           in: query
@@ -47,7 +51,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AccountResponse"
-                title: Response Get Account Account Get
+                title: Response Get Account Accounts Get
         "422":
           description: Validation Error
           content:
@@ -57,7 +61,9 @@ paths:
   /activities:
     get:
       summary: Get Activity
-      operationId: get_activity_activity_get
+      operationId: get_activity_activities_get
+      security:
+        - HTTPBearer: []
       parameters:
         - name: activity_id
           in: query
@@ -75,7 +81,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ActivityResponse"
-                title: Response Get Activity Activity Get
+                title: Response Get Activity Activities Get
         "422":
           description: Validation Error
           content:
@@ -85,7 +91,9 @@ paths:
   /accounts-balance/{account_id}:
     get:
       summary: Get Account Balance
-      operationId: get_account_balance_account_balance__account_id__get
+      operationId: get_account_balance_accounts_balance__account_id__get
+      security:
+        - HTTPBearer: []
       parameters:
         - name: account_id
           in: path
@@ -109,7 +117,9 @@ paths:
   /accounts/{account_id}:
     put:
       summary: Create Or Update Account
-      operationId: create_or_update_account_account__account_id__put
+      operationId: create_or_update_account_accounts__account_id__put
+      security:
+        - HTTPBearer: []
       parameters:
         - name: account_id
           in: path
@@ -130,9 +140,9 @@ paths:
             application/json:
               schema:
                 anyOf:
-                  - $ref: "#/components/schemas/UpdateAccountResponse"
+                  - $ref: "#/components/schemas/AccountResponse"
                   - type: object
-                title: Response Create Or Update Account Account  Account Id  Put
+                title: Response Create Or Update Account Accounts  Account Id  Put
         "422":
           description: Validation Error
           content:
@@ -142,7 +152,7 @@ paths:
   /users:
     post:
       summary: Register User
-      operationId: register_user_user_post
+      operationId: register_user_users_post
       requestBody:
         required: true
         content:
@@ -164,7 +174,9 @@ paths:
                 $ref: "#/components/schemas/HTTPValidationError"
     get:
       summary: Get User
-      operationId: get_user_user_get
+      operationId: get_user_users_get
+      security:
+        - HTTPBearer: []
       parameters:
         - name: user_id
           in: query
@@ -182,7 +194,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UserResponse"
-                title: Response Get User User Get
+                title: Response Get User Users Get
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /login:
+    post:
+      summary: Login
+      operationId: login_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUserRequest"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginUserResponse"
         "422":
           description: Validation Error
           content:
@@ -287,6 +322,32 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
+    LoginUserRequest:
+      properties:
+        email:
+          type: string
+          title: Email
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+        - email
+        - password
+      title: LoginUserRequest
+    LoginUserResponse:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        token_type:
+          type: string
+          title: Token Type
+          default: bearer
+      type: object
+      required:
+        - access_token
+      title: LoginUserResponse
     RegisterUserRequest:
       properties:
         user_id:
@@ -295,12 +356,20 @@ components:
         name:
           type: string
           title: Name
+        email:
+          type: string
+          title: Email
+        password:
+          type: string
+          title: Password
         address:
           $ref: "#/components/schemas/AddressRequestResponse"
       type: object
       required:
         - user_id
         - name
+        - email
+        - password
         - address
       title: RegisterUserRequest
     RegisterUserResponse:
@@ -311,78 +380,9 @@ components:
         name:
           type: string
           title: Name
-        address:
-          $ref: "#/components/schemas/AddressRequestResponse"
-      type: object
-      required:
-        - user_id
-        - name
-        - address
-      title: RegisterUserResponse
-    SendMoneyRequest:
-      properties:
-        source_account_id:
-          type: integer
-          title: Source Account Id
-        target_account_id:
-          type: integer
-          title: Target Account Id
-        amount:
-          type: number
-          title: Amount
-      type: object
-      required:
-        - source_account_id
-        - target_account_id
-        - amount
-      title: SendMoneyRequest
-    SendMoneyResponse:
-      properties:
-        source_account_id:
-          type: integer
-          title: Source Account Id
-        target_account_id:
-          type: integer
-          title: Target Account Id
-        amount:
-          type: number
-          title: Amount
-      type: object
-      required:
-        - source_account_id
-        - target_account_id
-        - amount
-      title: SendMoneyResponse
-    UpdateAccountRequest:
-      properties:
-        amount:
-          type: number
-          title: Amount
-      type: object
-      required:
-        - amount
-      title: UpdateAccountRequest
-    UpdateAccountResponse:
-      properties:
-        account_id:
-          type: integer
-          title: Account Id
-        balance:
-          type: number
-          title: Balance
-      type: object
-      required:
-        - account_id
-        - balance
-      title: UpdateAccountResponse
-    UserResponse:
-      properties:
-        user_id:
-          type: integer
-          title: User Id
-        name:
+        email:
           type: string
-          title: Name
+          title: Email
         address:
           $ref: "#/components/schemas/AddressRequestResponse"
         status:
@@ -392,6 +392,57 @@ components:
       required:
         - user_id
         - name
+        - email
+        - address
+        - status
+      title: RegisterUserResponse
+    SendMoneyRequestResponse:
+      properties:
+        source_account_id:
+          type: integer
+          title: Source Account Id
+        target_account_id:
+          type: integer
+          title: Target Account Id
+        amount:
+          type: number
+          title: Amount
+      type: object
+      required:
+        - source_account_id
+        - target_account_id
+        - amount
+      title: SendMoneyRequestResponse
+    UpdateAccountRequest:
+      properties:
+        baseline_balance:
+          type: number
+          title: Baseline Balance
+      type: object
+      required:
+        - baseline_balance
+      title: UpdateAccountRequest
+    UserResponse:
+      properties:
+        user_id:
+          type: integer
+          title: User Id
+        name:
+          type: string
+          title: Name
+        email:
+          type: string
+          title: Email
+        address:
+          $ref: "#/components/schemas/AddressRequestResponse"
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+        - user_id
+        - name
+        - email
         - address
         - status
       title: UserResponse
@@ -416,3 +467,7 @@ components:
         - msg
         - type
       title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

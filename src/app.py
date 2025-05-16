@@ -11,7 +11,9 @@ from src.application.domain.service.handlers import HANDLERS
 
 def create_app() -> FastAPI:
     container = Container()
-    container.wire(modules=[__name__, "src.common.container"])
+    container.wire(
+        modules=[__name__, "src.common.container", "src.adapter.inbound.web.jwt_utils"]
+    )
     event_dispatcher = container.event_dispatcher()
     event_dispatcher.subscribe(HANDLERS)
 

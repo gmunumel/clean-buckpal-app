@@ -20,10 +20,10 @@ def test_login_user_command():
 
 @pytest.mark.parametrize("email", ("", "foo", "foo@"))
 def test_login_user_command_invalid_email(email):
-    email = Email(email)
     password = Password("secret")
 
-    with pytest.raises(ValueError, match="Invalid email format."):
+    with pytest.raises(ValueError, match="Invalid email address."):
+        email = Email(email)
         LoginUserCommand(
             email=email,
             password=password,

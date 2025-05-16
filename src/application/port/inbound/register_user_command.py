@@ -19,9 +19,6 @@ class RegisterUserCommand:
     user_email: Email
     user_password: Password
 
-    def __post_init__(self):
-        pass
-
     def __repr__(self) -> str:
         return (
             f"RegisterUserCommand(user_id={self.user_id!r}, "

@@ -27,13 +27,15 @@ def test_update_account_command_money_validation_bigger_than_zero():
     account_id = AccountId(1)
     money = Money.of(-10)
 
-    with pytest.raises(ValueError, match="Money must be greater than zero."):
+    with pytest.raises(
+        ValueError, match="Money amount must be greater than zero."
+    ):
         UpdateAccountCommand(account_id=account_id, money=money)
 
 
 def test_update_account_command_account_id_validation_fails():
     account_id = None
-    money = Money.of(-10)
+    money = Money.of(1)
 
     with pytest.raises(ValueError, match="Account ID must be provided."):
         UpdateAccountCommand(account_id=account_id, money=money)  # type: ignore
